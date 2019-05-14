@@ -32,10 +32,17 @@ def get_soup(browser, url):
 
 
 def get_soup_next(browser, url):
-    delay = random.uniform(1, 10)
+    delay = random.uniform(5, 20)
     logger.debug(f"Sleeping {round(delay, 2)} seconds before clicking the link")
     time.sleep(delay)
     logger.debug(f"browser.find_element().click()")
+    # if cookie bar, click ok
+    try:
+        browser.find_element_by_class_name('as-oil__btn-optin').click()
+        logger.debug("Cookie bar found. Clicking on ok.")
+        time.sleep(random.uniform(2, 4))
+    except Exception as e:
+        logger.debug(f"Cookie bar not found, {e}")
     browser.find_element_by_class_name('navlinknext').click()
     # logger.debug("Scrolling down")
     # time.sleep(1)
@@ -98,6 +105,9 @@ def main():
     if genre:
         export_filename = f"{export_directory}/export_chart_{genre}.csv"
         url = f"https://rateyourmusic.com/customchart?page=1&genres={genre}"
+    elif not url:
+        logger.error("Error, genre or url not set")
+        exit()
 
     options = Options()
     options.headless = True
