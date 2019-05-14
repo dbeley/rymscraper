@@ -1,0 +1,5 @@
+.venv/
+tags
+*.txt
+*.csv
+*.log
