@@ -3,6 +3,7 @@ import time
 import argparse
 import random
 import pandas as pd
+from pathlib import Path
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
@@ -15,7 +16,7 @@ temps_debut = time.time()
 
 
 def get_soup(browser, url):
-    delay = random.uniform(10, 20)
+    delay = random.uniform(1, 2)
     logger.debug(f"Sleeping {round(delay, 2)} seconds before loading the page")
     time.sleep(delay)
     logger.debug(f"browser.get({url})")
@@ -31,11 +32,11 @@ def get_soup(browser, url):
 
 
 def get_soup_next(browser, url):
-    delay = random.uniform(10, 20)
+    delay = random.uniform(1, 10)
     logger.debug(f"Sleeping {round(delay, 2)} seconds before clicking the link")
     time.sleep(delay)
-    logger.debug(f"browser.findElement().click()")
-    browser.findElement(By.className('navlinknext')).click()
+    logger.debug(f"browser.find_element().click()")
+    browser.find_element_by_class_name('navlinknext').click()
     # logger.debug("Scrolling down")
     # time.sleep(1)
     # browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -65,7 +66,7 @@ def get_row_infos(row):
         logger.error(f"Album : {e}")
         dict_row['Album'] = 'NA'
     try:
-        dict_row['Year'] = row.find('span', {'class': 'chart_year'}).text.replace('(', '').replace(')', '')
+        dict_row['Year'] = row.find('div', {'class': 'chart_year'}).text.replace('(', '').replace(')', '')
     except Exception as e:
         logger.error(f"Year : {e}")
         dict_row['Year'] = 'NA'
@@ -91,14 +92,17 @@ def main():
     args = parse_args()
     url = args.url
     genre = args.genre
-    export_filename = "export_chart.csv"
+    export_directory = "Exports"
+    Path(export_directory).mkdir(parents=True, exist_ok=True)
+    export_filename = f"{export_directory}/export_chart.csv"
     if genre:
-        export_filename = f"export_chart_{genre}.csv"
+        export_filename = f"{export_directory}/export_chart_{genre}.csv"
         url = f"https://rateyourmusic.com/customchart?page=1&genres={genre}"
 
     options = Options()
     options.headless = True
-    browser = webdriver.Firefox(options=options)
+    # browser = webdriver.Firefox(options=options)
+    browser = webdriver.Firefox()
 
     soup = get_soup(browser, url)
     # page = 0
@@ -107,6 +111,9 @@ def main():
         try:
             table = soup.find('table', {'class': 'mbgen'})
             rows = table.find_all('tr')
+            if len(rows) == 0:
+                logger.debug("No rows extracted. Exiting")
+                break
             for row in rows:
                 # don't parse ads
                 if not row.select('script'):
@@ -116,6 +123,7 @@ def main():
             #     break
             if soup.select('a', {'class': 'navlinknext'}):
                 logger.debug("Next page found")
+                soup.decompose()
                 soup = get_soup_next(browser, url)
                 # url = f"https://rateyourmusic.com{soup.find('a', {'class': 'navlinknext'})['href']}"
                 # page += 1
@@ -129,7 +137,20 @@ def main():
                 f.write(soup.prettify())
             break
 
+    browser.quit()
+
+    columns = ['Rank',
+               'Album',
+               'Artist',
+               'Genres',
+               'Year',
+               'RYM Rating',
+               'Ratings',
+               'Reviews'
+               ]
+
     df = pd.DataFrame(list_rows)
+    df = df[columns]
     df.to_csv(export_filename, sep='\t', index=False)
 
     logger.debug("Runtime : %.2f seconds" % (time.time() - temps_debut))
