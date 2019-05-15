@@ -7,6 +7,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from rym_url import Rym_url
 
 logger = logging.getLogger()
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -16,7 +17,6 @@ temps_debut = time.time()
 
 def get_soup(browser, url):
     logger.info(f"URL : {url}")
-    # delay = random.uniform(10, 30)
     delay = random.uniform(1, 3)
     logger.debug(f"Sleeping {round(delay, 2)} seconds before loading the page")
     time.sleep(delay)
@@ -30,7 +30,7 @@ def get_soup(browser, url):
         logger.debug(f"Cookie bar not found, {e}")
 
     logger.debug(f"browser.get({url})")
-    browser.get(url)
+    browser.get(str(url))
 
     delay = random.uniform(1, 2)
     logger.debug(f"Sleeping {round(delay, 2)} seconds waiting for the page to load")
@@ -42,7 +42,6 @@ def get_soup(browser, url):
 
 def get_soup_next(browser, url):
     logger.info(f"URL : {url}")
-    # delay = random.uniform(10, 30)
     delay = random.uniform(1, 3)
     logger.debug(f"Sleeping {round(delay, 2)} seconds before clicking the link")
     time.sleep(delay)
@@ -150,51 +149,47 @@ def main():
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
     if not url:
-        # Default url : top albums of all-time
-        url = f"https://rateyourmusic.com/customchart?chart_type=top"
+        url = Rym_url()
         export_filename = f"{export_directory}/export_chart"
+        logger.debug(f"rym_url : {url}")
 
         if everything:
             export_filename += f"_everything"
-            url += f"&type=everything"
+            url.url_part_type += f"everything"
         else:
             export_filename += f"_album"
-            url += f"&type=album"
+            url.url_part_type += f"album"
         if year:
             export_filename += f"_{year}"
-            url += f"&year={year}"
+            url.url_part_year += f"{year}"
         if genre:
             export_filename += f"_{genre}"
-            url += f"&genre_include=1&include_child_genres=1&genres={genre}"
+            url.url_part_genres += f"{genre}"
         if country:
             export_filename += f"_{country}"
-            url += f"&origin_countries={country}&limit=none"
-        url += "&page="
+            url.url_part_origin_countries += f"{country}"
     else:
-        url += "/"
+        url.url_page_separator = "/"
         export_filename = f"{export_directory}/export_url"
+
+    logger.debug(f"completed rym_url : {url}")
 
     options = Options()
     options.headless = True
     browser = webdriver.Firefox(options=options)
-    # browser = webdriver.Firefox()
-    # browser.set_window_size(1920, 1080)
 
-    page = 1
-    # soup = get_soup(browser, url + f"&page={page}")
-    soup = get_soup(browser, url + f"{page}")
+    soup = get_soup(browser, url)
     list_rows = []
     while True:
         try:
             # rate-limit
             if soup.find('form', {'id': 'sec_verify'}):
-                url = browser.current_url
-                logger.error(f"Rate-limit detected. Restarting browser at page {url}")
+                logger.error(f"Rate-limit detected. Restarting browser at {url}")
                 # with open(f"{export_directory}/ratelimit_detected.html", 'w') as f:
                 #     f.write(soup.prettify())
-                # break
                 browser.quit()
                 browser = webdriver.Firefox(options=options)
+                soup.decompose()
                 soup = get_soup(browser, url)
 
             # table containing albums
@@ -215,18 +210,14 @@ def main():
                 # with open(f"{export_directory}/mbgen_not_found.html", 'w') as f:
                 #     f.write(soup.prettify())
                 break
-                # if page > 3:
-                #     break
 
             # link to the next page
             if soup.find('a', {'class': 'navlinknext'}):
                 logger.debug("Next page found")
-                page += 1
+                url.page += 1
                 soup.decompose()
                 try:
-                    soup = get_soup_next(browser, url)
-                    # soup = get_soup(browser, url + f"&page={page}")
-                    # soup = get_soup(browser, url + f"{page}")
+                    soup = get_soup(browser, url)
                 except Exception as e:
                     logger.error(e)
                     break
