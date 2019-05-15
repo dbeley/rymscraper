@@ -129,8 +129,8 @@ def get_row_infos(row):
     try:
         ratings = [x.strip() for x in row.find('div', {'class': 'chart_stats'}).find('a').text.split('|')]
         dict_row['RYM Rating'] = ratings[0].replace('RYM Rating: ', '')
-        dict_row['Ratings'] = ratings[1].replace('Ratings: ', '')
-        dict_row['Reviews'] = ratings[2].replace('Reviews: ', '')
+        dict_row['Ratings'] = ratings[1].replace('Ratings: ', '').replace(',', '')
+        dict_row['Reviews'] = ratings[2].replace('Reviews: ', '').replace(',', '')
     except Exception as e:
         logger.error(f"Ratings : {e}")
         dict_row['RYM Ratings'] = 'NA'
@@ -212,9 +212,8 @@ def main():
                         list_rows.append(dict_row)
             else:
                 logger.warning("Table class mbgen not found")
-                logger.debug("Writing soup for debugging to mbgen_not_found.html")
-                with open(f"{export_directory}/mbgen_not_found.html", 'w') as f:
-                    f.write(soup.prettify())
+                # with open(f"{export_directory}/mbgen_not_found.html", 'w') as f:
+                #     f.write(soup.prettify())
                 break
                 # if page > 3:
                 #     break
@@ -236,18 +235,17 @@ def main():
                 break
         except Exception as e:
             logger.error(f"Error scraping page {url} : {e}")
-            logger.debug("Writing soup for debugging to soup_error.html")
-            with open(f"{export_directory}/soup_error.html", 'w') as f:
-                f.write(soup.prettify())
+            # with open(f"{export_directory}/soup_error.html", 'w') as f:
+            #     f.write(soup.prettify())
             break
 
     browser.quit()
 
     columns = ['Rank',
-               'Album',
                'Artist',
-               'Genres',
+               'Album',
                'Year',
+               'Genres',
                'RYM Rating',
                'Ratings',
                'Reviews'
