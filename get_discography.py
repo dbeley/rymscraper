@@ -71,7 +71,7 @@ def get_artist_disco(soup):
             logger.debug(dict_disc)
 
             try:
-                dict_disc_complementary = get_complementary_disc_infos(disc, dict_disc['URL'])
+                dict_disc_complementary = get_complementary_disc_infos(disc, dict_disc['URL'], dict_disc['Year'])
                 logger.debug(dict_disc_complementary)
                 dict_disc.update(dict_disc_complementary)
             except Exception as e:
@@ -81,7 +81,7 @@ def get_artist_disco(soup):
     return artist_disco
 
 
-def get_complementary_disc_infos(disc, url):
+def get_complementary_disc_infos(disc, url, year):
     global browser
 
     soup = get_soup(browser, url)
@@ -97,7 +97,7 @@ def get_complementary_disc_infos(disc, url):
     except Exception as e:
         logger.warning(e)
     try:
-        dict_complementary['Rank Year'] = [x.replace('#', '') for y in dict_complementary['Ranked'].split(',') if dict_complementary['Year'] in y for x in y.split()][0]
+        dict_complementary['Rank Year'] = [x.replace('#', '') for y in dict_complementary['Ranked'].split(',') if year in y for x in y.split()][0]
     except Exception as e:
         logger.warning(e)
     return dict_complementary
