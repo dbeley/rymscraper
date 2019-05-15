@@ -15,7 +15,9 @@ temps_debut = time.time()
 
 
 def get_soup(browser, url):
-    delay = random.uniform(5, 20)
+    logger.info(f"URL : {url}")
+    # delay = random.uniform(10, 30)
+    delay = random.uniform(1, 3)
     logger.debug(f"Sleeping {round(delay, 2)} seconds before loading the page")
     time.sleep(delay)
 
@@ -23,14 +25,14 @@ def get_soup(browser, url):
     try:
         browser.find_element_by_class_name('as-oil__btn-optin').click()
         logger.debug("Cookie bar found. Clicking on ok.")
-        time.sleep(random.uniform(2, 4))
+        time.sleep(random.uniform(1, 2))
     except Exception as e:
         logger.debug(f"Cookie bar not found, {e}")
 
     logger.debug(f"browser.get({url})")
     browser.get(url)
 
-    delay = random.uniform(1, 4)
+    delay = random.uniform(1, 2)
     logger.debug(f"Sleeping {round(delay, 2)} seconds waiting for the page to load")
     time.sleep(delay)
 
@@ -39,7 +41,9 @@ def get_soup(browser, url):
 
 
 def get_soup_next(browser, url):
-    delay = random.uniform(5, 20)
+    logger.info(f"URL : {url}")
+    # delay = random.uniform(10, 30)
+    delay = random.uniform(1, 3)
     logger.debug(f"Sleeping {round(delay, 2)} seconds before clicking the link")
     time.sleep(delay)
 
@@ -47,16 +51,49 @@ def get_soup_next(browser, url):
     try:
         browser.find_element_by_class_name('as-oil__btn-optin').click()
         logger.debug("Cookie bar found. Clicking on ok.")
-        time.sleep(random.uniform(2, 4))
+        time.sleep(random.uniform(1, 2))
     except Exception as e:
         logger.debug(f"Cookie bar not found, {e}")
+
+    # trying to hide ad
+    try:
+        element = browser.find_element_by_xpath("//iframe[@class='tynt-ad-frame']")
+        logger.debug("Ad detected, trying to hide it")
+        browser.execute_script("arguments[0].style.visibility='hidden'", element)
+    except Exception as e:
+        logger.debug(f"No ad detected : {e}")
+    try:
+        element = browser.find_element_by_xpath("//iframe[@class='tynt-ad-frame-container']")
+        logger.debug("Ad detected, trying to hide it")
+        browser.execute_script("arguments[0].style.visibility='hidden'", element)
+    except Exception as e:
+        logger.debug(f"No ad detected : {e}")
+    try:
+        element = browser.find_element_by_xpath("//div[@class='tynt-ad-frame-container']")
+        logger.debug("Ad detected, trying to hide it")
+        browser.execute_script("arguments[0].style.visibility='hidden'", element)
+    except Exception as e:
+        logger.debug(f"No ad detected : {e}")
+    try:
+        element = browser.find_element_by_xpath("//div[@class='tynt-bottom-bar-pivot']")
+        logger.debug("Ad detected, trying to hide it")
+        browser.execute_script("arguments[0].style.visibility='hidden'", element)
+    except Exception as e:
+        logger.debug(f"No ad detected : {e}")
+    try:
+        element = browser.find_element_by_xpath("//div[@class='tynt-bottom-bar']")
+        logger.debug("Ad detected, trying to hide it")
+        browser.execute_script("arguments[0].style.visibility='hidden'", element)
+    except Exception as e:
+        logger.debug(f"No ad detected : {e}")
 
     logger.debug("Clicking on the next button")
     browser.find_element_by_class_name('navlinknext').click()
 
-    delay = random.uniform(1, 4)
+    delay = random.uniform(1, 2)
     logger.debug(f"Sleeping {round(delay, 2)} seconds waiting for the page to load")
     time.sleep(delay)
+
     soup = BeautifulSoup(browser.page_source, 'lxml')
     return soup
 
@@ -89,11 +126,6 @@ def get_row_infos(row):
     except Exception as e:
         logger.error(f"Genres : {e}")
         dict_row['Genres'] = 'NA'
-    try:
-        dict_row['Descriptors'] = row.find('div', {'class': 'extra_metadata_descriptors'}).text.strip()
-    except Exception as e:
-        logger.error(f"Descriptors : {e}")
-        dict_row['Descriptors'] = 'NA'
     try:
         ratings = [x.strip() for x in row.find('div', {'class': 'chart_stats'}).find('a').text.split('|')]
         dict_row['RYM Rating'] = ratings[0].replace('RYM Rating: ', '')
@@ -137,20 +169,36 @@ def main():
         if country:
             export_filename += f"_{country}"
             url += f"&origin_countries={country}&limit=none"
-
-    logger.debug(f"URL : {url}")
+        url += "&page="
+    else:
+        url += "/"
+        export_filename = f"{export_directory}/export_url"
 
     options = Options()
     options.headless = True
     browser = webdriver.Firefox(options=options)
     # browser = webdriver.Firefox()
+    # browser.set_window_size(1920, 1080)
 
     page = 1
-    soup = get_soup(browser, url + f"&page={page}")
+    # soup = get_soup(browser, url + f"&page={page}")
+    soup = get_soup(browser, url + f"{page}")
     list_rows = []
     while True:
         try:
-            if soup.select('table', {'class': 'mbgen'}):
+            # rate-limit
+            if soup.find('form', {'id': 'sec_verify'}):
+                url = browser.current_url
+                logger.error(f"Rate-limit detected. Restarting browser at page {url}")
+                # with open(f"{export_directory}/ratelimit_detected.html", 'w') as f:
+                #     f.write(soup.prettify())
+                # break
+                browser.quit()
+                browser = webdriver.Firefox(options=options)
+                soup = get_soup(browser, url)
+
+            # table containing albums
+            if soup.find('table', {'class': 'mbgen'}):
                 logger.debug("Table class mbgen found")
                 table = soup.find('table', {'class': 'mbgen'})
                 rows = table.find_all('tr')
@@ -159,30 +207,37 @@ def main():
                     break
                 for row in rows:
                     # don't parse ads
-                    if not row.select('script'):
+                    if not row.find('script'):
                         dict_row = get_row_infos(row)
                         list_rows.append(dict_row)
             else:
                 logger.warning("Table class mbgen not found")
-                logger.debug("Writing soup for debugging to mbgen_not_found.txt")
-                with open(f"{export_directory}/mbgen_not_found.txt", 'w') as f:
+                logger.debug("Writing soup for debugging to mbgen_not_found.html")
+                with open(f"{export_directory}/mbgen_not_found.html", 'w') as f:
                     f.write(soup.prettify())
                 break
                 # if page > 3:
                 #     break
-            if soup.select('a', {'class': 'navlinknext'}):
+
+            # link to the next page
+            if soup.find('a', {'class': 'navlinknext'}):
                 logger.debug("Next page found")
                 page += 1
                 soup.decompose()
-                # soup = get_soup_next(browser, url)
-                soup = get_soup(browser, url + f"&page={page}")
+                try:
+                    soup = get_soup_next(browser, url)
+                    # soup = get_soup(browser, url + f"&page={page}")
+                    # soup = get_soup(browser, url + f"{page}")
+                except Exception as e:
+                    logger.error(e)
+                    break
             else:
                 logger.debug("No next page found. Exiting.")
                 break
         except Exception as e:
-            logger.error(f"ERROR scraping page {url} : {e}")
-            logger.debug("Writing soup for debugging to soup_error.txt")
-            with open(f"{export_directory}/soup_error.txt", 'w') as f:
+            logger.error(f"Error scraping page {url} : {e}")
+            logger.debug("Writing soup for debugging to soup_error.html")
+            with open(f"{export_directory}/soup_error.html", 'w') as f:
                 f.write(soup.prettify())
             break
 
@@ -192,7 +247,6 @@ def main():
                'Album',
                'Artist',
                'Genres',
-               'Descriptors',
                'Year',
                'RYM Rating',
                'Ratings',
