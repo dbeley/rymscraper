@@ -128,7 +128,7 @@ def main():
         if separate_export:
             # have to put the dict in a list for some reason
             df_artist = pd.DataFrame([artist_info], index=[0])
-            export_filename_artist = f"{export_filename}_{artist_info['Name'].replace(' ', '_')}")
+            export_filename_artist = f"{export_filename}_{artist_info['Name'].replace(' ', '_')}"
             df_artist.to_csv(export_filename_artist, sep='\t', index=False)
 
     browser.quit()
