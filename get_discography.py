@@ -20,8 +20,12 @@ def get_urls_from_artists_name(browser, list_artists):
         url = f"{base_url}/search?searchtype=a&searchterm={artist}"
         logger.debug("Searching %s in url %s", artist, url)
         while True:
-            # browser.get_url(url)
-            soup = browser.get_soup(url)
+            browser.get_url(url)
+            soup = browser.get_soup()
+            if browser.is_ip_banned():
+                logger.error("IP banned from rym. Can't do any requests to the website")
+                browser.quit()
+                exit()
             if not browser.is_rate_limited():
                 break
         url_artist = f"{base_url}{soup.find('a', {'class': 'searchpage'})['href']}"
@@ -32,8 +36,12 @@ def get_urls_from_artists_name(browser, list_artists):
 
 def get_artist_disco(browser, url):
     while True:
-        # browser.get_url(url)
-        soup = browser.get_soup(url)
+        browser.get_url(url)
+        soup = browser.get_soup()
+        if browser.is_ip_banned():
+            logger.error("IP banned from rym. Can't do any requests to the website")
+            browser.quit()
+            exit()
         if not browser.is_rate_limited():
             break
     # artist discography
@@ -73,8 +81,12 @@ def get_complementary_infos_disc(browser, dict_disc, url_disc):
     try:
         # complementary infos
         while True:
-            # browser.get_url(url_disc)
-            soup = browser.get_soup(url_disc)
+            browser.get_url(url_disc)
+            soup = browser.get_soup()
+            if browser.is_ip_banned():
+                logger.error("IP banned from rym. Can't do any requests to the website")
+                browser.quit()
+                exit()
             if not browser.is_rate_limited():
                 break
         dict_complementary = {}
@@ -106,8 +118,7 @@ def main():
     file_url = args.file_url
     file_artist = args.file_artist
     separate_export = args.separate_export
-
-    browser = Rym_browser()
+    no_headless = args.no_headless
 
     if not any([url, artist, file_url, file_artist]):
         logger.error("Not enought arguments. Use -h to see available arguments.")
@@ -134,6 +145,9 @@ def main():
             logger.error(e)
             exit()
         logger.debug("Option file_artist found, list_artists : %s", list_artists)
+
+    # starting selenium browser
+    browser = Rym_browser(headless=no_headless)
 
     if list_artists:
         list_urls = get_urls_from_artists_name(browser, list_artists)
@@ -190,7 +204,8 @@ def parse_args():
     parser.add_argument('--file_artist', help="File containing the artist to extract (one by line)", type=str)
     parser.add_argument('-a', '--artist', help="Artist to extract (separated by comma)", type=str)
     parser.add_argument('-s', '--separate_export', help="Also export the artists in separate files", action="store_true", dest="separate_export")
-    parser.set_defaults(separate_export=False)
+    parser.add_argument('--no_headless', help="Launch selenium in foreground (background by default)", action="store_false", dest="no_headless")
+    parser.set_defaults(separate_export=False, no_headless=True)
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel)
