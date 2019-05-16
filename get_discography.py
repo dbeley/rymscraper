@@ -20,8 +20,8 @@ def get_urls_from_artists_name(browser, list_artists):
         url = f"{base_url}/search?searchtype=a&searchterm={artist}"
         logger.debug("Searching %s in url %s", artist, url)
         while True:
-            browser.get_url(url)
-            soup = browser.get_soup()
+            # browser.get_url(url)
+            soup = browser.get_soup(url)
             if not browser.is_rate_limited():
                 break
         url_artist = f"{base_url}{soup.find('a', {'class': 'searchpage'})['href']}"
@@ -32,8 +32,8 @@ def get_urls_from_artists_name(browser, list_artists):
 
 def get_artist_disco(browser, url):
     while True:
-        browser.get_url(url)
-        soup = browser.get_soup()
+        # browser.get_url(url)
+        soup = browser.get_soup(url)
         if not browser.is_rate_limited():
             break
     # artist discography
@@ -73,8 +73,8 @@ def get_complementary_infos_disc(browser, dict_disc, url_disc):
     try:
         # complementary infos
         while True:
-            browser.get_url(url_disc)
-            soup = browser.get_soup()
+            # browser.get_url(url_disc)
+            soup = browser.get_soup(url_disc)
             if not browser.is_rate_limited():
                 break
         dict_complementary = {}
