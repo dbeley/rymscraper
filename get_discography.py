@@ -19,31 +19,18 @@ def get_urls_from_artists_name(browser, list_artists):
         artist = artist.replace(' ', '+')
         url = f"{base_url}/search?searchtype=a&searchterm={artist}"
         logger.debug("Searching %s in url %s", artist, url)
-        while True:
-            browser.get_url(url)
-            soup = browser.get_soup()
-            if browser.is_ip_banned():
-                logger.error("IP banned from rym. Can't do any requests to the website")
-                browser.quit()
-                exit()
-            if not browser.is_rate_limited():
-                break
+        browser.get_url(url)
+        soup = browser.get_soup()
         url_artist = f"{base_url}{soup.find('a', {'class': 'searchpage'})['href']}"
         logger.info("%s found : %s", artist, url_artist)
         list_urls.append(url_artist)
     return list_urls
 
 
-def get_artist_disco(browser, url):
-    while True:
-        browser.get_url(url)
-        soup = browser.get_soup()
-        if browser.is_ip_banned():
-            logger.error("IP banned from rym. Can't do any requests to the website")
-            browser.quit()
-            exit()
-        if not browser.is_rate_limited():
-            break
+def get_artist_disco(browser, url, complementary_infos):
+    browser.get_url(url)
+    soup = browser.get_soup()
+
     # artist discography
     artist_disco = []
     artist = soup.find('h1', {'class': 'artist_name_hdr'}).text.strip()
@@ -67,12 +54,13 @@ def get_artist_disco(browser, url):
             dict_disc['Date'] = date['title'].strip()
             dict_disc['Year'] = date.text.strip()
             dict_disc['Average Rating'] = disc.find('div', {'class': 'disco_avg_rating'}).text
-            dict_disc['Ratings'] = disc.find('div', {'class': 'disco_ratings'}).text
-            dict_disc['Reviews'] = disc.find('div', {'class': 'disco_reviews'}).text
+            dict_disc['Ratings'] = disc.find('div', {'class': 'disco_ratings'}).text.replace(',', '')
+            dict_disc['Reviews'] = disc.find('div', {'class': 'disco_reviews'}).text.replace(',', '')
             # logger.debug('Final dict for %s : %s', artist, dict_disc)
 
             logger.debug('Getting information for disc %s - %s - %s', artist, album.text.strip(), date.text.strip())
-            dict_disc = get_complementary_infos_disc(browser, dict_disc, url_disc)
+            if complementary_infos:
+                dict_disc = get_complementary_infos_disc(browser, dict_disc, url_disc)
             artist_disco.append(dict_disc)
     return artist_disco
 
@@ -80,15 +68,8 @@ def get_artist_disco(browser, url):
 def get_complementary_infos_disc(browser, dict_disc, url_disc):
     try:
         # complementary infos
-        while True:
-            browser.get_url(url_disc)
-            soup = browser.get_soup()
-            if browser.is_ip_banned():
-                logger.error("IP banned from rym. Can't do any requests to the website")
-                browser.quit()
-                exit()
-            if not browser.is_rate_limited():
-                break
+        browser.get_url(url_disc)
+        soup = browser.get_soup()
         dict_complementary = {}
         table = soup.find('table', {'class': 'album_info'})
         table_descriptors = [x.find('th').text.strip() for x in table.find_all('tr')]
@@ -113,42 +94,38 @@ def get_complementary_infos_disc(browser, dict_disc, url_disc):
 
 def main():
     args = parse_args()
-    url = args.url
-    artist = args.artist
-    file_url = args.file_url
-    file_artist = args.file_artist
-    separate_export = args.separate_export
-    no_headless = args.no_headless
 
-    if not any([url, artist, file_url, file_artist]):
+    # arguments parsing
+    if not any([args.url, args.artist, args.file_url, args.file_artist]):
         logger.error("Not enought arguments. Use -h to see available arguments.")
         exit()
-    if url:
-        list_urls = [x.strip() for x in url.split(',') if x.strip()]
+    if args.url:
+        list_urls = [x.strip() for x in args.url.split(',') if x.strip()]
         logger.debug("Option url found, list_urls : %s", list_urls)
-    if file_url:
+    if args.file_url:
         try:
-            with open(file_url) as f:
-                list_urls = [x.strip() for x in f.readlines() if x.strip()]
+            with open(args.file_url) as f:
+                list_urls = [x.strip() for x in f.readlines() if x.strip() and not x.startswith('#')]
         except Exception as e:
             logger.error(e)
             exit()
         logger.debug("Option file_url found, list_urls : %s", list_urls)
-    if artist:
-        list_artists = [x.strip() for x in artist.split(',') if x.strip()]
+    if args.artist:
+        list_artists = [x.strip() for x in args.artist.split(',') if x.strip()]
         logger.debug("Option artist found, list_artists : %s", list_artists)
-    if file_artist:
+    if args.file_artist:
         try:
-            with open(file_artist) as f:
-                list_artists = [x.strip() for x in f if x.strip()]
+            with open(args.file_artist) as f:
+                list_artists = [x.strip() for x in f if x.strip() and not x.startswith('#')]
         except Exception as e:
             logger.error(e)
             exit()
         logger.debug("Option file_artist found, list_artists : %s", list_artists)
 
     # starting selenium browser
-    browser = Rym_browser(headless=no_headless)
+    browser = Rym_browser(headless=args.no_headless)
 
+    # search url from artist name
     if list_artists:
         list_urls = get_urls_from_artists_name(browser, list_artists)
 
@@ -158,14 +135,15 @@ def main():
 
     export_filename = f"{export_directory}/export_discography_{int(time.time())}"
 
+    # extracting discography
     list_artists_disco = []
     for url in list_urls:
         logger.debug('Getting artist discography for url %s', url)
 
-        artist_disco = get_artist_disco()
+        artist_disco = get_artist_disco(browser, url, args.complementary_infos)
         list_artists_disco.extend(artist_disco)
 
-        if separate_export:
+        if args.separate_export:
             # have to put the dict in a list for some reason
             df_artist = pd.DataFrame([artist_disco], index=[0])
             export_filename_artist = f"{export_filename}_{artist_disco[0]['Name'].replace(' ', '_')}"
@@ -190,6 +168,7 @@ def main():
     #            ]
 
     df = pd.DataFrame(list_artists_disco)
+    # reorder columns
     # df = df[columns]
     df.to_csv(export_filename + '.csv', sep='\t', index=False)
 
@@ -204,8 +183,9 @@ def parse_args():
     parser.add_argument('--file_artist', help="File containing the artist to extract (one by line)", type=str)
     parser.add_argument('-a', '--artist', help="Artist to extract (separated by comma)", type=str)
     parser.add_argument('-s', '--separate_export', help="Also export the artists in separate files", action="store_true", dest="separate_export")
+    parser.add_argument('-c', '--complementary_infos', help="Extract complementary_infos for each releases (slower, more requests on rym)", action="store_true", dest="complementary_infos")
     parser.add_argument('--no_headless', help="Launch selenium in foreground (background by default)", action="store_false", dest="no_headless")
-    parser.set_defaults(separate_export=False, no_headless=True)
+    parser.set_defaults(separate_export=False, no_headless=True, complementary_infos=False)
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel)
