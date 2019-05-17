@@ -17,28 +17,28 @@ def get_row_infos(row):
     try:
         dict_row['Rank'] = row.find('span', {'class': 'ooookiig'}).text
     except Exception as e:
-        logger.error(f"Rank : {e}")
+        logger.error("Rank : %s", e)
         dict_row['Rank'] = 'NA'
     try:
         dict_row['Artist'] = row.find('a', {'class': 'artist'}).text
     except Exception as e:
-        logger.error(f"Artist: {e}")
+        logger.error("Artist: %s", e)
         dict_row['Artist'] = 'NA'
     try:
         dict_row['Album'] = row.find('a', {'class': 'album'}).text
-        logger.debug(f"{dict_row['Rank']} - {dict_row['Artist']} - {dict_row['Album']}")
+        logger.debug("%s - %s - %s", dict_row['Rank'], dict_row['Artist'], dict_row['Album'])
     except Exception as e:
-        logger.error(f"Album : {e}")
+        logger.error("Album : %s", e)
         dict_row['Album'] = 'NA'
     try:
         dict_row['Year'] = row.find('div', {'class': 'chart_year'}).text.replace('(', '').replace(')', '')
     except Exception as e:
-        logger.error(f"Year : {e}")
+        logger.error("Year : %s", e)
         dict_row['Year'] = 'NA'
     try:
         dict_row['Genres'] = ', '.join([x.text for x in row.find('div', {'class': 'chart_detail_line3'}).find_all('a', {'class': 'genre'})])
     except Exception as e:
-        logger.error(f"Genres : {e}")
+        logger.error("Genres : %s", e)
         dict_row['Genres'] = 'NA'
     try:
         ratings = [x.strip() for x in row.find('div', {'class': 'chart_stats'}).find('a').text.split('|')]
@@ -46,7 +46,7 @@ def get_row_infos(row):
         dict_row['Ratings'] = ratings[1].replace('Ratings: ', '').replace(',', '')
         dict_row['Reviews'] = ratings[2].replace('Reviews: ', '').replace(',', '')
     except Exception as e:
-        logger.error(f"Ratings : {e}")
+        logger.error("Ratings : %s", e)
         dict_row['RYM Ratings'] = 'NA'
         dict_row['Ratings'] = 'NA'
         dict_row['Reviews'] = 'NA'
@@ -61,7 +61,7 @@ def main():
     if not args.url:
         url = Rym_url()
         export_filename = f"{export_directory}/export_chart"
-        logger.debug(f"rym_url : {url}")
+        logger.debug("rym_url : %s", url)
 
         if args.everything:
             export_filename += f"_everything"
@@ -82,7 +82,7 @@ def main():
         url.url_page_separator = "/"
         export_filename = f"{export_directory}/export_url"
 
-    logger.debug(f"completed rym_url : {url}")
+    logger.debug("completed rym_url : %s", url)
 
     browser = Rym_browser(headless=args.no_headless)
 
@@ -126,7 +126,7 @@ def main():
                 logger.debug("No next page found. Exiting.")
                 break
         except Exception as e:
-            logger.error(f"Error scraping page {url} : {e}")
+            logger.error("Error scraping page %s : {e}", url)
             # with open(f"{export_directory}/soup_error.html", 'w') as f:
             #     f.write(soup.prettify())
             break
