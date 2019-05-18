@@ -3,9 +3,10 @@ import time
 import argparse
 import re
 import pandas as pd
+from tqdm import tqdm
 from pathlib import Path
 from utils.rym_browser import Rym_browser
-from utils.rym_utils import get_urls_from_artists_name
+from utils.rym_utils import get_urls_from_artist_name
 
 logger = logging.getLogger()
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -20,15 +21,15 @@ def get_artist_disco(browser, url, complementary_infos):
     # artist discography
     artist_disco = []
     artist = soup.find('h1', {'class': 'artist_name_hdr'}).text.strip()
-    logger.debug('Extracting discography for %s', artist)
+    logger.info('Extracting discography for %s', artist)
     disco = soup.find('div', {'id': 'discography'})
     logger.debug("Sections find_all")
     sections = disco.find_all('div', {'class': 'disco_header_top'})
     for section in sections:
         category = section.find('h3').text.strip()
-        logger.debug("discs find_all")
+        logger.info("Section %s", category)
         discs = section.find_next_sibling('div', {'id': re.compile('disco_type_*')}).find_all('div', {'class': 'disco_release'})
-        for disc in discs:
+        for disc in tqdm(discs, dynamic_ncols=True):
             dict_disc = {}
             dict_disc['Artist'] = artist
             dict_disc['Category'] = category
@@ -66,11 +67,11 @@ def get_complementary_infos_disc(browser, dict_disc, url_disc):
         try:
             dict_complementary['Rank Overall'] = [x.replace('#', '').replace(',', '') for y in dict_complementary['Ranked'].split(', ') if 'overall' in y for x in y.split()][0]
         except Exception as e:
-            logger.warning("No overall rank found : %s", e)
+            logger.debug("No overall rank found : %s", e)
         try:
             dict_complementary['Rank Year'] = [x.replace('#', '').replace(',', '') for y in dict_complementary['Ranked'].split(', ') if dict_disc['Year'] in y for x in y.split()][0]
         except Exception as e:
-            logger.warning("No year rank found : %s", e)
+            logger.debug("No year rank found : %s", e)
         # logger.debug('Complementary dict extracted : %s', dict_disc_complementary)
         dict_disc.update(dict_complementary)
     except Exception as e:
@@ -113,7 +114,7 @@ def main():
 
     # search url from artist name
     if list_artists:
-        list_urls = get_urls_from_artists_name(browser, list_artists)
+        list_urls = get_urls_from_artist_name(browser, list_artists)
 
     logger.debug('final list_urls : %s', list_urls)
     export_directory = "Exports"
@@ -122,12 +123,12 @@ def main():
     export_filename = f"{export_directory}/export_discography_{int(time.time())}"
 
     # extracting discography
-    list_artists_disco = []
+    list_artist_disco = []
     for url in list_urls:
         logger.debug('Getting artist discography for url %s', url)
 
         artist_disco = get_artist_disco(browser, url, args.complementary_infos)
-        list_artists_disco.extend(artist_disco)
+        list_artist_disco.extend(artist_disco)
 
         if args.separate_export:
             # have to put the dict in a list for some reason
@@ -153,7 +154,7 @@ def main():
     #            'Recorded',
     #            ]
 
-    df = pd.DataFrame(list_artists_disco)
+    df = pd.DataFrame(list_artist_disco)
     # reorder columns
     # df = df[columns]
     df.to_csv(export_filename + '.csv', sep='\t', index=False)
@@ -162,7 +163,7 @@ def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Scraper rateyourmusic (artist version).')
+    parser = argparse.ArgumentParser(description='Scraper rateyourmusic (discography version).')
     parser.add_argument('--debug', help="Display debugging information", action="store_const", dest="loglevel", const=logging.DEBUG, default=logging.INFO)
     parser.add_argument('-u', '--url', help="URL to extract (separated by comma)", type=str)
     parser.add_argument('--file_url', help="File containing the URL to extract (one by line)", type=str)

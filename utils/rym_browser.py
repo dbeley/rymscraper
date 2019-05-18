@@ -23,6 +23,12 @@ class Rym_browser(webdriver.Firefox):
         logger.debug('get_url(browser, %s)', url)
         while True:
             self.get(str(url))
+            # if cookie bar found, click on the ok button
+            try:
+                self.find_element_by_class_name('as-oil__btn-optin').click()
+                logger.debug("Cookie bar found. Clicking on ok.")
+            except Exception as e:
+                logger.debug("Cookie bar not found, %s", e)
             if self.is_ip_banned():
                 logger.error("IP banned from rym. Can't do any requests to the website. Exiting.")
                 self.quit()

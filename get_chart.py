@@ -90,6 +90,7 @@ def main():
     while True:
         try:
             browser.get_url(url)
+            logger.info("Extracting albums for url %s", url)
             soup = browser.get_soup()
 
             # table containing albums
