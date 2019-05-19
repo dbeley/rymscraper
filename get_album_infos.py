@@ -19,9 +19,6 @@ def get_album_info(soup):
     album_info['Artist'] = soup.find('div', {'class': 'album_title'}).text.split('\n')[2].strip()[3:]
 
     album_infos = [[x.find('th').text.strip(), x.find('td').text.strip()] for x in soup.find('table', {'class': 'album_info'}).find_all('tr')]
-    # album_info_descriptors = [x.text.strip() for x in soup.find('table', {'class': 'album_info'}).find_all('th', {'class': 'info_hdr'})]
-    # album_info_values = [x.nextSibling.text.strip() for x in soup.find('table', {'class': 'album_info'}).find_all('div', {'class': 'info_hdr'})]
-    # for d, v, in zip(album_info_descriptors, album_info_values):
     for info in album_infos:
         album_info[info[0]] = info[1]
 
