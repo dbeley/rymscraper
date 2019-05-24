@@ -15,17 +15,19 @@ class Rym_url:
         self.page = 1
 
     def __repr__(self):
-        final_url = self.url_base + \
-                    self.url_part_type + \
-                    self.url_part_year + \
-                    self.url_part_genre_include + \
-                    self.url_part_child_genres + \
-                    self.url_part_genres + \
-                    self.url_part_include_child_genres_chk + \
-                    self.url_part_include_both + \
-                    self.url_part_origin_countries + \
-                    self.url_part_limit + \
-                    self.url_part_countries + \
-                    self.page_separator + \
-                    str(self.page)
+        final_url = (
+            self.url_base
+            + self.url_part_type
+            + self.url_part_year
+            + self.url_part_genre_include
+            + self.url_part_child_genres
+            + self.url_part_genres
+            + self.url_part_include_child_genres_chk
+            + self.url_part_include_both
+            + self.url_part_origin_countries
+            + self.url_part_limit
+            + self.url_part_countries
+            + self.page_separator
+            + str(self.page)
+        )
         return final_url

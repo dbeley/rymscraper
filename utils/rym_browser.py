@@ -20,17 +20,19 @@ class Rym_browser(webdriver.Firefox):
         webdriver.Firefox.__init__(self, options=self.options)
 
     def get_url(self, url):
-        logger.debug('get_url(browser, %s)', url)
+        logger.debug("get_url(browser, %s)", url)
         while True:
             self.get(str(url))
             # if cookie bar found, click on the ok button
             try:
-                self.find_element_by_class_name('as-oil__btn-optin').click()
+                self.find_element_by_class_name("as-oil__btn-optin").click()
                 logger.debug("Cookie bar found. Clicking on ok.")
             except Exception as e:
                 logger.debug("Cookie bar not found, %s", e)
             if self.is_ip_banned():
-                logger.error("IP banned from rym. Can't do any requests to the website. Exiting.")
+                logger.error(
+                    "IP banned from rym. Can't do any requests to the website. Exiting."
+                )
                 self.quit()
                 exit()
             if self.is_rate_limited():
@@ -41,11 +43,11 @@ class Rym_browser(webdriver.Firefox):
         return
 
     def get_soup(self):
-        return BeautifulSoup(self.page_source, 'lxml')
+        return BeautifulSoup(self.page_source, "lxml")
 
     def is_ip_banned(self):
         logger.debug("soup.title : %s", self.get_soup().title)
-        return self.get_soup().title.text.strip() == 'IP blocked'
+        return self.get_soup().title.text.strip() == "IP blocked"
 
     def is_rate_limited(self):
-        return self.get_soup().find('form', {'id': 'sec_verify'})
+        return self.get_soup().find("form", {"id": "sec_verify"})
