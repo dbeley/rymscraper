@@ -1,10 +1,10 @@
 # rym-scraper
 
-Scripts to scrap rateyourmusic
+Scripts to scrap rateyourmusic.com
 
-- get_album_infos.py : retrieve information of one or several albums by name or url
-- get_artist_infos.py : retrieve the information of one or several artists by name or url
-- get_chart.py : extract the albums from a chart by name, year or url
+- get_album_infos.py : extract informations about one or several albums by name or url
+- get_artist_infos.py : extract informations about one or several artists by name or url
+- get_chart.py : extract albums information appearing in a chart by name, year or url
 - get_discography.py : extract the discography of one or several artists by name or url
 
 ## Requirements
@@ -25,7 +25,10 @@ pipenv install
 ## Usage
 
 ```
+python get_album_infos.py -a "ride - nowhere"
 python get_artist_infos.py -a "u2,xtc,brad mehldau"
+python get_chart.py -g rock
+python get_discography.py -a magma
 ```
 
 ## Help
