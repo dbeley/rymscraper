@@ -3,9 +3,7 @@ import time
 import argparse
 import pandas as pd
 from pathlib import Path
-from tqdm import tqdm
-from utils.rym_browser import Rym_browser
-from utils.rym_utils import get_urls_from_album_name
+import rymscraper
 
 logger = logging.getLogger()
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -13,34 +11,11 @@ logging.getLogger("selenium").setLevel(logging.WARNING)
 temps_debut = time.time()
 
 
-def get_album_info(soup):
-    album_info = {}
-    album_info["Name"] = (
-        soup.find("div", {"class": "album_title"}).text.split("\n")[0].strip()
-    )
-    album_info["Artist"] = (
-        soup.find("div", {"class": "album_title"})
-        .text.split("\n")[2]
-        .strip()[3:]
-    )
-
-    album_infos = [
-        [x.find("th").text.strip(), x.find("td").text.strip()]
-        for x in soup.find("table", {"class": "album_info"}).find_all("tr")
-    ]
-    for info in album_infos:
-        album_info[info[0]] = info[1]
-
-    return album_info
-
-
 def main():
     args = parse_args()
 
     # arguments parsing
-    if not any(
-        [args.url, args.album_name, args.file_url, args.file_album_name]
-    ):
+    if not any([args.url, args.artist, args.file_url, args.file_artist]):
         logger.error(
             "Not enought arguments. Use -h to see available arguments."
         )
@@ -60,68 +35,70 @@ def main():
             logger.error(e)
             exit()
         logger.debug("Option file_url found, list_urls : %s", list_urls)
-    if args.album_name:
-        list_albums = [
-            [x.strip() for x in y.split("-")]
-            for y in args.album_name.split(",")
-            if y.strip()
-        ]
-        logger.debug("Option album_name found, list_albums : %s", list_albums)
-    if args.file_album_name:
+    if args.artist:
+        list_artists = [x.strip() for x in args.artist.split(",") if x.strip()]
+        logger.debug("Option artist found, list_artists : %s", list_artists)
+    if args.file_artist:
         try:
-            with open(args.file_album_name) as f:
-                list_albums = [
-                    [x.strip() for x in y.split("-")]
-                    for y in f
-                    if y.strip() and not y.startswith("#")
+            with open(args.file_artist) as f:
+                list_artists = [
+                    x.strip() for x in f if x.strip() and not x.startswith("#")
                 ]
         except Exception as e:
             logger.error(e)
             exit()
         logger.debug(
-            "Option file_album_name found, list_albums : %s", list_albums
+            "Option file_artist found, list_artists : %s", list_artists
         )
 
-    # starting selenium browser
-    browser = Rym_browser(headless=args.no_headless)
+    RymNetwork = rymscraper.RymNetwork(headless=args.no_headless)
+    if list_artists:
+        list_artists_infos = RymNetwork.get_artists_infos(names=list_artists)
+    elif list_urls:
+        logger.debug(list_urls)
+        list_artists_infos = RymNetwork.get_artists_infos(urls=list_urls)
 
-    if list_albums:
-        list_urls = get_urls_from_album_name(browser, list_albums)
+    # if list_artists:
+    #     list_urls = get_urls_from_artist_name(browser, list_artists)
 
-    logger.debug(list_urls)
     # exit()
     export_directory = "Exports"
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
-    export_filename = f"{export_directory}/export_album_{int(time.time())}"
+    export_filename = f"{export_directory}/export_artist_{int(time.time())}"
 
-    list_album_infos = []
-    for url in tqdm(list_urls, dynamic_ncols=True):
-        browser.get_url(url)
-        soup = browser.get_soup()
+    RymNetwork.browser.quit()
 
-        album_info = get_album_info(soup)
-        list_album_infos.append(album_info)
-
-        if args.separate_export:
-            # have to put the dict in a list for some reason
-            df_album = pd.DataFrame([album_info], index=[0])
-            export_filename_album = (
-                f"{export_filename}_{album_info['Name'].replace(' ', '_')}"
-            )
-            df_album.to_csv(export_filename_album, sep="\t", index=False)
-
-    browser.quit()
-
-    df = pd.DataFrame(list_album_infos)
+    df = pd.DataFrame(list_artists_infos)
     df.to_csv(export_filename + ".csv", sep="\t", index=False)
+
+    # list_artist_infos = []
+    # for url in tqdm(list_urls, dynamic_ncols=True):
+    #    browser.get_url(url)
+    #    soup = browser.get_soup()
+
+    #    artist_info = get_artist_info(soup)
+    #    list_artist_infos.append(artist_info)
+
+    #    if args.separate_export:
+    #        # have to put the dict in a list for some reason
+    #        df_artist = pd.DataFrame([artist_info], index=[0])
+    #        export_filename_artist = (
+    #            f"{export_filename}_{artist_info['Name'].replace(' ', '_')}"
+    #        )
+    #        df_artist.to_csv(export_filename_artist, sep="\t", index=False)
+
+    # browser.quit()
+
+    # df = pd.DataFrame(list_artist_infos)
+    # df.to_csv(export_filename + ".csv", sep="\t", index=False)
 
     logger.debug("Runtime : %.2f seconds" % (time.time() - temps_debut))
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Scraper rateyourmusic (album version)."
+        description="Scraper rateyourmusic (artist version)."
     )
     parser.add_argument(
         "--debug",
@@ -140,14 +117,14 @@ def parse_args():
         type=str,
     )
     parser.add_argument(
-        "--file_album_name",
-        help="File containing the name of the albums to extract (one by line, format Artist - Album)",
+        "--file_artist",
+        help="File containing the artist to extract (one by line)",
         type=str,
     )
     parser.add_argument(
         "-a",
-        "--album_name",
-        help="Album to extract (separated by comma, format Artist - Album)",
+        "--artist",
+        help="Artist to extract (separated by comma)",
         type=str,
     )
     parser.add_argument(

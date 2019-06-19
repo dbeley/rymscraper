@@ -1,4 +1,4 @@
-class Rym_url:
+class RymUrl:
     def __init__(self):
         self.url_base = f"https://rateyourmusic.com/customchart?chart_type=top"
         self.url_part_type = "&type="

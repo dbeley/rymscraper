@@ -1,6 +1,10 @@
-# rym-scraper
+# rymscraper
 
-Scripts to scrap rateyourmusic.com
+/!\ WIP
+
+Python API to extract data from rateyourmusic.com.
+
+To see some working examples, see the scripts in the examples folder.
 
 - get_album_infos.py : extract informations about one or several albums by name or url
 - get_artist_infos.py : extract informations about one or several artists by name or url
@@ -16,10 +20,10 @@ Scripts to scrap rateyourmusic.com
 - selenium
 - tqdm
 
-## Installation of the virtualenv (recommended)
+## Installation in a virtualenv (recommended)
 
 ```
-pipenv install
+pipenv install '-e .'
 ```
 
 ## Usage

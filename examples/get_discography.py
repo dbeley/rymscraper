@@ -3,38 +3,12 @@ import time
 import argparse
 import pandas as pd
 from pathlib import Path
-from tqdm import tqdm
-from utils.rym_browser import Rym_browser
-from utils.rym_utils import get_urls_from_artist_name
+import rymscraper
 
 logger = logging.getLogger()
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("selenium").setLevel(logging.WARNING)
 temps_debut = time.time()
-
-
-def get_artist_info(soup):
-    artist_info = {}
-    artist_info["Name"] = soup.find(
-        "h1", {"class": "artist_name_hdr"}
-    ).text.strip()
-
-    artist_info_descriptors = [
-        x.text.strip()
-        for x in soup.find("div", {"class": "artist_info"}).find_all(
-            "div", {"class": "info_hdr"}
-        )
-    ]
-    artist_info_values = [
-        x.nextSibling.text.strip()
-        for x in soup.find("div", {"class": "artist_info"}).find_all(
-            "div", {"class": "info_hdr"}
-        )
-    ]
-    for d, v in zip(artist_info_descriptors, artist_info_values):
-        artist_info[d] = v
-
-    return artist_info
 
 
 def main():
@@ -77,38 +51,68 @@ def main():
             "Option file_artist found, list_artists : %s", list_artists
         )
 
-    # starting selenium browser
-    browser = Rym_browser(headless=args.no_headless)
-
+    # # starting selenium browser
+    # browser = Rym_browser(headless=args.no_headless)
+    RymNetwork = rymscraper.RymNetwork(headless=args.no_headless)
     if list_artists:
-        list_urls = get_urls_from_artist_name(browser, list_artists)
+        list_artists_disco = RymNetwork.get_discographies_infos(
+            names=list_artists, complementary_infos=args.complementary_infos
+        )
+    elif list_urls:
+        logger.debug(list_urls)
+        list_artists_disco = RymNetwork.get_discographies_infos(
+            urls=list_urls, complementary_infos=args.complementary_infos
+        )
 
-    logger.debug(list_urls)
-    # exit()
+    RymNetwork.browser.quit()
+
+    # # search url from artist name
+    # if list_artists:
+    #     list_urls = get_urls_from_artist_name(browser, list_artists)
+
     export_directory = "Exports"
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
-    export_filename = f"{export_directory}/export_artist_{int(time.time())}"
+    export_filename = (
+        f"{export_directory}/export_discography_{int(time.time())}"
+    )
 
-    list_artist_infos = []
-    for url in tqdm(list_urls, dynamic_ncols=True):
-        browser.get_url(url)
-        soup = browser.get_soup()
+    # # extracting discography
+    # list_artist_disco = []
+    # for url in list_urls:
+    #     logger.debug("Getting artist discography for url %s", url)
 
-        artist_info = get_artist_info(soup)
-        list_artist_infos.append(artist_info)
+    #     artist_disco = get_artist_disco(browser, url, args.complementary_infos)
+    #     list_artist_disco.extend(artist_disco)
 
-        if args.separate_export:
-            # have to put the dict in a list for some reason
-            df_artist = pd.DataFrame([artist_info], index=[0])
-            export_filename_artist = (
-                f"{export_filename}_{artist_info['Name'].replace(' ', '_')}"
-            )
-            df_artist.to_csv(export_filename_artist, sep="\t", index=False)
+    #     if args.separate_export:
+    #         # have to put the dict in a list for some reason
+    #         df_artist = pd.DataFrame([artist_disco], index=[0])
+    #         export_filename_artist = f"{export_filename}_{artist_disco[0]['Name'].replace(' ', '_')}"
+    #         df_artist.to_csv(export_filename_artist, sep="\t", index=False)
 
-    browser.quit()
+    # browser.quit()
 
-    df = pd.DataFrame(list_artist_infos)
+    # columns = ['Artist',
+    #            'Name',
+    #            'URL',
+    #            'Category',
+    #            'Type',
+    #            'Year',
+    #            'Date',
+    #            'Average Rating',
+    #            'Ratings',
+    #            'Reviews',
+    #            'Genres',
+    #            'Language',
+    #            'Descriptors',
+    #            'Recorded',
+    #            ]
+
+    df = pd.DataFrame.from_records(list_artists_disco)
+    # reorder columns
+    # df = df[columns]
+    logger.debug("Exporting file to %s", export_filename + ".csv")
     df.to_csv(export_filename + ".csv", sep="\t", index=False)
 
     logger.debug("Runtime : %.2f seconds" % (time.time() - temps_debut))
@@ -116,7 +120,7 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Scraper rateyourmusic (artist version)."
+        description="Scraper rateyourmusic (discography version)."
     )
     parser.add_argument(
         "--debug",
@@ -153,12 +157,21 @@ def parse_args():
         dest="separate_export",
     )
     parser.add_argument(
+        "-c",
+        "--complementary_infos",
+        help="Extract complementary_infos for each releases (slower, more requests on rym)",
+        action="store_true",
+        dest="complementary_infos",
+    )
+    parser.add_argument(
         "--no_headless",
         help="Launch selenium in foreground (background by default)",
         action="store_false",
         dest="no_headless",
     )
-    parser.set_defaults(separate_export=False, no_headless=True)
+    parser.set_defaults(
+        separate_export=False, no_headless=True, complementary_infos=False
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel)
