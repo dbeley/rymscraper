@@ -25,18 +25,18 @@ Or you can simply install the package with
 python setup.py install
 ```
 
-## Examples
+## Example
 
 ```
 import rymscraper
 
 network = rymscraper.RymNetwork()
 
-# artist
-artist_infos = network.get_artist_infos(name="Weezer")
-
 # album
 album_infos = network.get_album_infos(name="XTC - Black Sea")
+
+# artist
+artist_infos = network.get_artist_infos(name="Weezer")
 
 # chart
 # slow for very long chart
@@ -46,7 +46,7 @@ chart_infos = network.get_chart_infos(url=URL_CHART)
 discography_infos = network.get_discography_infos(name="Aufgang", complementary_infos=True)
 ```
 
-### Example Scripts
+## Example Scripts
 
 Some scripts are included in the examples folder.
 
@@ -56,7 +56,7 @@ Some scripts are included in the examples folder.
 - get_discography.py : extract the discography of one or several artists by name or url
 
 
-#### Usage
+### Usage
 
 ```
 python get_album_infos.py -a "ride - nowhere"
@@ -65,7 +65,7 @@ python get_chart.py -g rock
 python get_discography.py -a magma
 ```
 
-#### Help
+### Help
 
 ```
 python get_album_infos.py -h
