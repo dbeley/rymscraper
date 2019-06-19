@@ -22,9 +22,11 @@ def main():
             "Not enought arguments. Use -h to see available arguments."
         )
         exit()
+    list_urls = None
+    list_albums = None
     if args.url:
         list_urls = [x.strip() for x in args.url.split(",") if x.strip()]
-        logger.debug("Option url found, list_urls : %s", list_urls)
+        logger.debug("Option url found, list_urls : %s.", list_urls)
     if args.file_url:
         try:
             with open(args.file_url) as f:
@@ -36,25 +38,15 @@ def main():
         except Exception as e:
             logger.error(e)
             exit()
-        logger.debug("Option file_url found, list_urls : %s", list_urls)
+        logger.debug("Option file_url found, list_urls : %s.", list_urls)
     if args.album_name:
-        # list_albums = [
-        #     [x.strip() for x in y.split("-")]
-        #     for y in args.album_name.split(",")
-        #     if y.strip()
-        # ]
         list_albums = [
             x.strip() for x in args.album_name.split(",") if x.strip()
         ]
-        logger.debug("Option album_name found, list_albums : %s", list_albums)
+        logger.debug("Option album_name found, list_albums : %s.", list_albums)
     if args.file_album_name:
         try:
             with open(args.file_album_name) as f:
-                # list_albums = [
-                #     [x.strip() for x in y.split("-")]
-                #     for y in f
-                #     if y.strip() and not y.startswith("#")
-                # ]
                 list_albums = [
                     x.strip() for x in f if not x.startswith("#") and x.strip()
                 ]
@@ -62,10 +54,11 @@ def main():
             logger.error(e)
             exit()
         logger.debug(
-            "Option file_album_name found, list_albums : %s", list_albums
+            "Option file_album_name found, list_albums : %s.", list_albums
         )
 
     RymNetwork = rymscraper.RymNetwork(headless=args.no_headless)
+    logger.info("Extracting albums infos.")
     if list_albums:
         list_albums_infos = RymNetwork.get_albums_infos(names=list_albums)
     elif list_urls:
@@ -79,10 +72,11 @@ def main():
 
     RymNetwork.browser.quit()
 
+    logger.info("Exporting results to %s.", export_filename + ".csv")
     df = pd.DataFrame(list_albums_infos)
     df.to_csv(export_filename + ".csv", sep="\t", index=False)
 
-    logger.debug("Runtime : %.2f seconds" % (time.time() - temps_debut))
+    logger.debug("Runtime : %.2f seconds." % (time.time() - temps_debut))
 
 
 def parse_args():
@@ -91,41 +85,41 @@ def parse_args():
     )
     parser.add_argument(
         "--debug",
-        help="Display debugging information",
+        help="Display debugging information.",
         action="store_const",
         dest="loglevel",
         const=logging.DEBUG,
         default=logging.INFO,
     )
     parser.add_argument(
-        "-u", "--url", help="URL to extract (separated by comma)", type=str
+        "-u", "--url", help="URL to extract (separated by comma).", type=str
     )
     parser.add_argument(
         "--file_url",
-        help="File containing the URL to extract (one by line)",
+        help="File containing the URL to extract (one by line).",
         type=str,
     )
     parser.add_argument(
         "--file_album_name",
-        help="File containing the name of the albums to extract (one by line, format Artist - Album)",
+        help="File containing the name of the albums to extract (one by line, format Artist - Album).",
         type=str,
     )
     parser.add_argument(
         "-a",
         "--album_name",
-        help="Album to extract (separated by comma, format Artist - Album)",
+        help="Album to extract (separated by comma, format Artist - Album).",
         type=str,
     )
     parser.add_argument(
         "-s",
         "--separate_export",
-        help="Also export the artists in separate files",
+        help="Also export the artists in separate files.",
         action="store_true",
         dest="separate_export",
     )
     parser.add_argument(
         "--no_headless",
-        help="Launch selenium in foreground (background by default)",
+        help="Launch selenium in foreground (background by default).",
         action="store_false",
         dest="no_headless",
     )

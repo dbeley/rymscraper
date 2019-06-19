@@ -85,7 +85,7 @@ class RymNetwork:
         while True:
             try:
                 self.browser.get_url(url)
-                logger.info("Extracting chart rows for url %s", url)
+                logger.debug("Extracting chart rows for url %s", url)
                 soup = self.browser.get_soup()
 
                 # table containing albums

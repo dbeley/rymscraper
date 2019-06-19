@@ -1,0 +1,16 @@
+dist: xenial
+language: python
+python:
+    - "3.6"
+    - "3.7"
+os:
+    - "linux"
+install:
+    - "pip install pipenv"
+    - "pip install codecov"
+    - "pip install pytest pytest-cov"
+    - "pipenv sync"
+script:
+    - pytest --cov=./
+after_success:
+    - codecov

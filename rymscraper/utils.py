@@ -62,6 +62,11 @@ def get_album_infos(soup):
     for info in album_complementary_infos:
         album_infos[info[0]] = info[1]
 
+    try:
+        del album_infos["Share"]
+    except KeyError:
+        pass
+
     return album_infos
 
 
@@ -85,6 +90,11 @@ def get_artist_infos(soup):
     ]
     for d, v in zip(artist_infos_descriptors, artist_infos_values):
         artist_infos[d] = v
+
+    try:
+        del artist_infos["Share"]
+    except KeyError:
+        pass
 
     return artist_infos
 
@@ -164,13 +174,13 @@ def get_artist_disco(browser, url, complementary_infos):
     # artist discography
     artist_disco = []
     artist = soup.find("h1", {"class": "artist_name_hdr"}).text.strip()
-    logger.info("Extracting discography for %s", artist)
+    logger.debug("Extracting discography for %s", artist)
     disco = soup.find("div", {"id": "discography"})
     logger.debug("Sections find_all")
     sections = disco.find_all("div", {"class": "disco_header_top"})
     for section in sections:
         category = section.find("h3").text.strip()
-        logger.info("Section %s", category)
+        logger.debug("Section %s", category)
         discs = section.find_next_sibling(
             "div", {"id": re.compile("disco_type_*")}
         ).find_all("div", {"class": "disco_release"})
@@ -245,7 +255,6 @@ def get_complementary_infos_disc(browser, dict_disc, url_disc):
             ][0]
         except Exception as e:
             logger.debug("No year rank found : %s", e)
-        # logger.debug('Complementary dict extracted : %s', dict_disc_complementary)
         dict_disc.update(dict_complementary)
     except Exception as e:
         logger.error(e)
