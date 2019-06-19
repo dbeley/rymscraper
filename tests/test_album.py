@@ -1,3 +1,11 @@
+import pytest
+import os
+
+
+@pytest.mark.skipif(
+    "TRAVIS" in os.environ and os.environ["TRAVIS"] == "true",
+    reason="doesn't work with Travis",
+)
 def test_album_infos(network):
     url_album = "https://rateyourmusic.com/release/album/everything-everything/get-to-heaven-2/"
 
