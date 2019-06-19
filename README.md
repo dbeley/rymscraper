@@ -1,5 +1,8 @@
 # rymscraper
 
+[![Build Status](https://travis-ci.com/dbeley/rymscraper.svg?branch=master)](https://travis-ci.com/dbeley/rymscraper)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8601652424ab44698fd00f6a46a2140e)](https://www.codacy.com/app/dbeley/rymscraper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dbeley/rymscraper&amp;utm_campaign=Badge_Grade)
+
 Python API to extract data from rateyourmusic.com.
 
 ## Requirements
@@ -54,7 +57,6 @@ Some scripts are included in the examples folder.
 - get_artist_infos.py : extract informations about one or several artists by name or url
 - get_chart.py : extract albums information appearing in a chart by name, year or url
 - get_discography.py : extract the discography of one or several artists by name or url
-
 
 ### Usage
 
