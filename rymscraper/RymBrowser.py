@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Rym_browser(webdriver.Firefox):
+class RymBrowser(webdriver.Firefox):
     def __init__(self, headless=True):
         logger.debug("Starting Selenium Browser : headless = %s", headless)
         self.options = Options()

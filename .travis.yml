@@ -1,0 +1,23 @@
+addons: 
+    firefox: latest
+dist: xenial
+language: python
+python:
+    - "3.6"
+    - "3.7"
+os:
+    - "linux"
+before_install:
+    - "wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz"
+    - "mkdir geckodriver"
+    - "tar -xzf geckodriver-v0.24.0-linux64.tar.gz -C geckodriver"
+    - "export PATH=$PATH:$PWD/geckodriver"
+install:
+    - "pip install pipenv"
+    - "pip install codecov"
+    - "pip install pytest pytest-cov"
+    - "pipenv sync"
+script:
+    - pytest --cov=./
+after_success:
+    - codecov

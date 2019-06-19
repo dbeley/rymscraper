@@ -4,14 +4,17 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
 
 [packages]
-bs4 = "*"
 requests = "*"
-lxml = "*"
 pandas = "*"
+bs4 = "*"
+lxml = "*"
 selenium = "*"
 tqdm = "*"
+e1839a8 = {editable = true,path = "."}
+rymscraper = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"

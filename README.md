@@ -1,11 +1,6 @@
-# rym-scraper
+# rymscraper
 
-Scripts to scrap rateyourmusic.com
-
-- get_album_infos.py : extract informations about one or several albums by name or url
-- get_artist_infos.py : extract informations about one or several artists by name or url
-- get_chart.py : extract albums information appearing in a chart by name, year or url
-- get_discography.py : extract the discography of one or several artists by name or url
+Python API to extract data from rateyourmusic.com.
 
 ## Requirements
 
@@ -16,13 +11,52 @@ Scripts to scrap rateyourmusic.com
 - selenium
 - tqdm
 
-## Installation of the virtualenv (recommended)
+## Installation
+
+Installation in a virtualenv with pipenv (recommended)
 
 ```
-pipenv install
+pipenv install '-e .'
 ```
 
-## Usage
+Or you can simply install the package with
+
+```
+python setup.py install
+```
+
+## Example
+
+```
+import rymscraper
+
+network = rymscraper.RymNetwork()
+
+# album
+album_infos = network.get_album_infos(name="XTC - Black Sea")
+
+# artist
+artist_infos = network.get_artist_infos(name="Weezer")
+
+# chart
+# slow for very long chart
+chart_infos = network.get_chart_infos(url=URL_CHART)
+
+# discography
+discography_infos = network.get_discography_infos(name="Aufgang", complementary_infos=True)
+```
+
+## Example Scripts
+
+Some scripts are included in the examples folder.
+
+- get_album_infos.py : extract informations about one or several albums by name or url
+- get_artist_infos.py : extract informations about one or several artists by name or url
+- get_chart.py : extract albums information appearing in a chart by name, year or url
+- get_discography.py : extract the discography of one or several artists by name or url
+
+
+### Usage
 
 ```
 python get_album_infos.py -a "ride - nowhere"
@@ -31,7 +65,7 @@ python get_chart.py -g rock
 python get_discography.py -a magma
 ```
 
-## Help
+### Help
 
 ```
 python get_album_infos.py -h

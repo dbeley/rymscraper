@@ -1,6 +1,8 @@
 archives/
+build/
 Exports/
 .venv/
+*.egg-info/
 tags
 *.txt
 *.csv
