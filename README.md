@@ -5,7 +5,7 @@
 
 Python API to extract data from rateyourmusic.com.
 
-Warning : Be aware that an excessive usage of this can make your IP address banned by rateyourmusic.
+Warning : Be aware that an excessive usage of this can make your IP address banned by rateyourmusic for a few days.
 
 ## Requirements
 
