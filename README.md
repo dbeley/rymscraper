@@ -34,6 +34,7 @@ python setup.py install
 
 ```
 import rymscraper
+from rymscraper import RymUrl
 
 network = rymscraper.RymNetwork()
 
@@ -41,11 +42,12 @@ network = rymscraper.RymNetwork()
 album_infos = network.get_album_infos(name="XTC - Black Sea")
 
 # artist
-artist_infos = network.get_artist_infos(name="Weezer")
+artist_infos = network.get_artist_infos(name="Daft Punk")
 
 # chart
 # slow for very long chart
-chart_infos = network.get_chart_infos(url=URL_CHART)
+rym_url = RymUrl.RymUrl()
+chart_infos = network.get_chart_infos(rym_url=rym_url, max_page=None)
 
 # discography
 discography_infos = network.get_discography_infos(name="Aufgang", complementary_infos=True)

@@ -52,7 +52,7 @@ def main():
         "Rank",
         "Artist",
         "Album",
-        "Year",
+        "Date",
         "Genres",
         "RYM Rating",
         "Ratings",

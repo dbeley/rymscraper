@@ -124,14 +124,15 @@ def get_chart_row_infos(row):
         logger.error("Album : %s", e)
         dict_row["Album"] = "NA"
     try:
-        dict_row["Year"] = (
+        dict_row["Date"] = (
             row.find("div", {"class": "chart_year"})
             .text.replace("(", "")
             .replace(")", "")
+            .strip()
         )
     except Exception as e:
-        logger.error("Year : %s", e)
-        dict_row["Year"] = "NA"
+        logger.error("Date : %s", e)
+        dict_row["Date"] = "NA"
     try:
         dict_row["Genres"] = ", ".join(
             [

@@ -70,12 +70,15 @@ class RymNetwork:
 
         return list_artists_infos
 
-    def get_chart_infos(self, url: str = None) -> List[Dict]:
+    def get_chart_infos(
+        self, url: str = None, max_page: int = None
+    ) -> List[Dict]:
         """Returns a list of dicts containing chart infos.
 
         Parameters:
             url: An url for a chart. Can be created with the RymUrl helper.
             See the get_chart.py script in the examples folder for an example.
+            max_page: The max number of pages to extract from the chart.
 
         Returns:
             list_rows: List of dicts for each rows from the chart.
@@ -108,6 +111,8 @@ class RymNetwork:
                 # link to the next page
                 if soup.find("a", {"class": "navlinknext"}):
                     logger.debug("Next page found")
+                    if max_page and url.page == max_page:
+                        break
                     url.page += 1
                     soup.decompose()
                     try:
