@@ -46,7 +46,7 @@ def main():
     RymNetwork = rymscraper.RymNetwork(headless=args.no_headless)
 
     logger.info("Extracting infos from the chart.")
-    list_rows = RymNetwork.get_chart_infos(url)
+    list_rows = RymNetwork.get_chart_infos(url, max_page=args.page)
 
     columns = [
         "Rank",
@@ -89,6 +89,12 @@ def parse_args():
     parser.add_argument("-y", "--year", help="Chart Option : Year.", type=str)
     parser.add_argument(
         "-c", "--country", help="Chart Option : Country.", type=str
+    )
+    parser.add_argument(
+        "-p",
+        "--page",
+        help="Number of page to extract. If not set, every pages will be extracted.",
+        type=int,
     )
     parser.add_argument(
         "-e",
