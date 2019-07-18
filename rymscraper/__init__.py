@@ -144,7 +144,7 @@ class RymNetwork:
 
         self.browser.get_url(url)
         artist_disco = utils.get_artist_disco(
-            self.browser, url, complementary_infos
+            self.browser.get_soup(), complementary_infos
         )
         return artist_disco
 
@@ -162,25 +162,12 @@ class RymNetwork:
                     name=name, complementary_infos=complementary_infos
                 )
                 list_artists_discos.extend(artist_disco)
-
-            # list_artists_discos = [
-            #     self.get_discography_infos(
-            #         name=x, complementary_infos=complementary_infos
-            #     )
-            #     for x in names
-            # ]
         elif urls:
             for url in urls:
                 artist_disco = self.get_discography_infos(
                     url=url, complementary_infos=complementary_infos
                 )
                 list_artists_discos.extend(artist_disco)
-            # list_artists_discos = [
-            #     self.get_discography_infos(
-            #         url=x, complementary_infos=complementary_infos
-            #     )
-            #     for x in urls
-            # ]
         else:
             raise Exception("No list of urls or names entered. Exiting.")
 
