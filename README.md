@@ -9,7 +9,7 @@ Warning : Be aware that an excessive usage of this can make your IP address bann
 
 ## Requirements
 
-- bs4
+- beautifulsoup4
 - lxml
 - requests
 - pandas
@@ -31,6 +31,8 @@ python setup.py install
 ```
 
 ## Example
+
+The data format used by the library is the python dict. It can be easily converted to CSV or JSON.
 
 ```
 import rymscraper
@@ -57,10 +59,10 @@ discography_infos = network.get_discography_infos(name="Aufgang", complementary_
 
 Some scripts are included in the examples folder.
 
-- get_album_infos.py : extract informations about one or several albums by name or url
-- get_artist_infos.py : extract informations about one or several artists by name or url
-- get_chart.py : extract albums information appearing in a chart by name, year or url
-- get_discography.py : extract the discography of one or several artists by name or url
+- get_album_infos.py : extract informations about one or several albums by name or url in a csv file.
+- get_artist_infos.py : extract informations about one or several artists by name or url in a csv file.
+- get_chart.py : extract albums information appearing in a chart by name, year or url in a csv file.
+- get_discography.py : extract the discography of one or several artists by name or url in a csv file.
 
 ### Usage
 

@@ -29,6 +29,7 @@ class RymNetwork:
         if not url:
             raise Exception("Invalid url or name. Exiting.")
 
+        logger.info("Extracting album informations for %s.", url)
         self.browser.get_url(url)
         album_infos = utils.get_album_infos(self.browser.get_soup())
         return album_infos
@@ -53,6 +54,7 @@ class RymNetwork:
         if not url:
             raise Exception("Invalid url or name. Exiting.")
 
+        logger.info("Extracting artist informations for %s.", url)
         self.browser.get_url(url)
         artist_infos = utils.get_artist_infos(self.browser.get_soup())
         return artist_infos
@@ -84,6 +86,8 @@ class RymNetwork:
             list_rows: List of dicts for each rows from the chart.
 
         """
+        logger.info("Extracting chart informations for %s.", url)
+
         list_rows = []
         while True:
             try:
@@ -142,6 +146,7 @@ class RymNetwork:
         if not url:
             raise Exception("Invalid url or name. Exiting.")
 
+        logger.info("Extracting discography informations for %s.", url)
         self.browser.get_url(url)
         artist_disco = utils.get_artist_disco(
             self.browser.get_soup(), complementary_infos

@@ -4,7 +4,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "*"
 
 [packages]
 requests = "*"
@@ -13,7 +12,6 @@ bs4 = "*"
 lxml = "*"
 selenium = "*"
 tqdm = "*"
-e1839a8 = {editable = true,path = "."}
 rymscraper = {editable = true,path = "."}
 
 [requires]
