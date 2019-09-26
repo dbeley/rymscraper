@@ -19,13 +19,13 @@ def test_album_infos(network):
 
     if (
         album_infos["Descriptors"]
-        != "energetic,  anxious,  war,  playful,  political,  conscious,  apocalyptic,  satirical,  angry,  existential,  rhythmic,  male vocals,  progressive,  violence,  quirky,  melodic"
+        != "energetic,  anxious,  war,  playful,  political,  conscious,  apocalyptic,  satirical,  angry,  existential,  rhythmic,  male vocals,  progressive,  violence,  melodic,  quirky"
     ):
         raise AssertionError()
 
     if (
         album_infos["Genres"]
-        != "Progressive Pop, Art Pop\nIndietronica, New Wave, Alternative Dance"
+        != "Progressive Pop, Art Pop\nIndietronica, New Wave, Alternative Dance, Power Pop"
     ):
         raise AssertionError()
 
