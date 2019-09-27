@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "26178beed485ff5d4c70d14d228dfafb3ab74b25ff75355258c5edbec7fda781"
+            "sha256": "3da80f12cd79418d0064eaca79f20d14973ca4c5685c4ade3a85461c983d0194"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -137,6 +137,10 @@
             ],
             "index": "pypi",
             "version": "==2.22.0"
+        },
+        "rymscraper": {
+            "editable": true,
+            "path": "."
         },
         "selenium": {
             "hashes": [
