@@ -64,6 +64,9 @@ def main():
     logger.info("Exporting results to %s.", export_filename + ".csv")
     df.to_csv(export_filename + ".csv", sep="\t", index=False)
 
+    RymNetwork.browser.close()
+    RymNetwork.browser.quit()
+
     logger.debug("Runtime : %.2f seconds." % (time.time() - temps_debut))
 
 

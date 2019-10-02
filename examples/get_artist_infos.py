@@ -66,6 +66,7 @@ def main():
 
     export_filename = f"{export_directory}/export_artist_{int(time.time())}"
 
+    RymNetwork.browser.close()
     RymNetwork.browser.quit()
 
     logger.info("Exporting results to %s.", export_filename + ".csv")

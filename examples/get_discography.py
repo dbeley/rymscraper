@@ -66,6 +66,7 @@ def main():
             urls=list_urls, complementary_infos=args.complementary_infos
         )
 
+    RymNetwork.browser.close()
     RymNetwork.browser.quit()
 
     export_directory = "Exports"
