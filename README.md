@@ -53,6 +53,10 @@ chart_infos = network.get_chart_infos(rym_url=rym_url, max_page=None)
 
 # discography
 discography_infos = network.get_discography_infos(name="Aufgang", complementary_infos=True)
+
+# close the browser
+network.browser.close()
+network.browser.quit()
 ```
 
 ## Example Scripts

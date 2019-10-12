@@ -19,5 +19,12 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: POSIX :: Linux",
     ],
-    install_requires=["requests", "pandas", "bs4", "lxml", "selenium", "tqdm"],
+    install_requires=[
+        "requests",
+        "pandas",
+        "beautifulsoup4",
+        "lxml",
+        "selenium",
+        "tqdm",
+    ],
 )
