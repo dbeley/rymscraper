@@ -38,6 +38,7 @@ def main():
             export_filename += f"_{args.country}"
             url.url_part_origin_countries += f"{args.country}"
     else:
+        url = RymUrl.RymUrl()
         url.url_page_separator = "/"
         export_filename = f"{export_directory}/export_url"
 
