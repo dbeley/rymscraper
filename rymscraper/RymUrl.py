@@ -1,3 +1,4 @@
+# For now you will have to directly change the string values. Look at examples/get_chart.py for examples.
 class RymUrl:
     def __init__(self):
         self.url_base = f"https://rateyourmusic.com/customchart?chart_type=top"

@@ -36,25 +36,39 @@ The data format used by the library is the python dict. It can be easily convert
 
 ```
 import rymscraper
+import pandas as pd
 from rymscraper import RymUrl
 
 network = rymscraper.RymNetwork()
 
-# album
-album_infos = network.get_album_infos(name="XTC - Black Sea")
-
 # artist
 artist_infos = network.get_artist_infos(name="Daft Punk")
+# you can easily convert all returned values to a pandas dataframe
+df = pd.DataFrame([artist_infos])
 
-# chart
-# slow for very long chart
+# several artists
+list_artists_infos = network.get_artists_infos(names=["Air", "Bonobo", "Aphex Twin", "M83"])
+df = pd.DataFrame(list_artists_infos)
+
+# chart (slow for very long charts)
 rym_url = RymUrl.RymUrl()
-chart_infos = network.get_chart_infos(rym_url=rym_url, max_page=None)
+chart_infos = network.get_chart_infos(rym_url=rym_url, max_page=3)
+df = pd.DataFrame(chart_infos)
 
 # discography
 discography_infos = network.get_discography_infos(name="Aufgang", complementary_infos=True)
+df = pd.DataFrame.from_records(discography_infos)
 
-# close the browser
+# album
+# name field should use the format Artist - Album name (not ideal but it works for now)
+album_infos = network.get_album_infos(name="XTC - Black Sea")
+df = pd.DataFrame([album_infos])
+
+# several albums
+list_album_infos = network.get_albums_infos(names=["Ride - Nowhere", "Electrelane - Axes", "Stereolab - Dots and Loops", "Blur - The Great Escape"])
+df = pd.DataFrame(list_album_infos)
+
+# don't forget to close and quit the browser (prevent memory leaks)
 network.browser.close()
 network.browser.quit()
 ```
@@ -63,48 +77,25 @@ network.browser.quit()
 
 Some scripts are included in the examples folder.
 
-- get_album_infos.py : extract informations about one or several albums by name or url in a csv file.
 - get_artist_infos.py : extract informations about one or several artists by name or url in a csv file.
 - get_chart.py : extract albums information appearing in a chart by name, year or url in a csv file.
 - get_discography.py : extract the discography of one or several artists by name or url in a csv file.
+- get_album_infos.py : extract informations about one or several albums by name or url in a csv file.
 
 ### Usage
 
 ```
-python get_album_infos.py -a "ride - nowhere"
 python get_artist_infos.py -a "u2,xtc,brad mehldau"
+python get_artist_infos.py --file_artist artist_list.txt
+
 python get_chart.py -g rock
+
 python get_discography.py -a magma
+
+python get_album_infos.py -a "ride - nowhere"
 ```
 
 ### Help
-
-```
-python get_album_infos.py -h
-```
-
-```
-usage: get_album_infos.py [-h] [--debug] [-u URL] [--file_url FILE_URL]
-                          [--file_album_name FILE_ALBUM_NAME] [-a ALBUM_NAME]
-                          [-s] [--no_headless]
-
-Scraper rateyourmusic (album version).
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --debug               Display debugging information
-  -u URL, --url URL     URL to extract (separated by comma)
-  --file_url FILE_URL   File containing the URL to extract (one by line)
-  --file_album_name FILE_ALBUM_NAME
-                        File containing the name of the albums to extract (one
-                        by line, format Artist - Album)
-  -a ALBUM_NAME, --album_name ALBUM_NAME
-                        Album to extract (separated by comma, format Artist -
-                        Album)
-  -s, --separate_export
-                        Also export the artists in separate files
-  --no_headless         Launch selenium in foreground (background by default)
-```
 
 ```
 python get_artist_infos.py -h
@@ -179,5 +170,32 @@ optional arguments:
   -c, --complementary_infos
                         Extract complementary_infos for each releases (slower,
                         more requests on rym)
+  --no_headless         Launch selenium in foreground (background by default)
+```
+
+```
+python get_album_infos.py -h
+```
+
+```
+usage: get_album_infos.py [-h] [--debug] [-u URL] [--file_url FILE_URL]
+                          [--file_album_name FILE_ALBUM_NAME] [-a ALBUM_NAME]
+                          [-s] [--no_headless]
+
+Scraper rateyourmusic (album version).
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --debug               Display debugging information
+  -u URL, --url URL     URL to extract (separated by comma)
+  --file_url FILE_URL   File containing the URL to extract (one by line)
+  --file_album_name FILE_ALBUM_NAME
+                        File containing the name of the albums to extract (one
+                        by line, format Artist - Album)
+  -a ALBUM_NAME, --album_name ALBUM_NAME
+                        Album to extract (separated by comma, format Artist -
+                        Album)
+  -s, --separate_export
+                        Also export the artists in separate files
   --no_headless         Launch selenium in foreground (background by default)
 ```
