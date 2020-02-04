@@ -11,6 +11,7 @@ def test_chart_infos(network):
     url = RymUrl.RymUrl()
 
     chart_infos = network.get_chart_infos(url, max_page=1)
+    print(len(chart_infos))
 
     if not len(chart_infos) == 40:
         raise AssertionError()
