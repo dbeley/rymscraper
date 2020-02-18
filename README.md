@@ -89,10 +89,13 @@ python get_artist_infos.py -a "u2,xtc,brad mehldau"
 python get_artist_infos.py --file_artist artist_list.txt
 
 python get_chart.py -g rock
+python get_chart.py -g ambient -y 2010s -c France --everything
 
 python get_discography.py -a magma
+python get_discography.py -a "the new pornographers, ween, stereolab" --complementary_infos --separate_export
 
 python get_album_infos.py -a "ride - nowhere"
+python get_album_infos.py --file_url urls_list.txt --no_headless
 ```
 
 ### Help
