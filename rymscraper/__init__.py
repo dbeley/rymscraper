@@ -149,7 +149,7 @@ class RymNetwork:
         logger.info("Extracting discography informations for %s.", url)
         self.browser.get_url(url)
         artist_disco = utils.get_artist_disco(
-            self.browser.get_soup(), complementary_infos
+            self.browser, self.browser.get_soup(), complementary_infos
         )
         return artist_disco
 

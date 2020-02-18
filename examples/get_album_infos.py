@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import logging
 import time
 import argparse
@@ -97,7 +98,7 @@ def parse_args():
     )
     parser.add_argument(
         "--file_url",
-        help="File containing the URL to extract (one by line).",
+        help="File containing the URLs to extract (one by line).",
         type=str,
     )
     parser.add_argument(
@@ -108,7 +109,7 @@ def parse_args():
     parser.add_argument(
         "-a",
         "--album_name",
-        help="Album to extract (separated by comma, format Artist - Album).",
+        help="Albums to extract (separated by comma, format Artist - Album).",
         type=str,
     )
     parser.add_argument(

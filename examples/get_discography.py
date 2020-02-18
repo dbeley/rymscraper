@@ -114,22 +114,22 @@ def parse_args():
         default=logging.INFO,
     )
     parser.add_argument(
-        "-u", "--url", help="URL to extract (separated by comma).", type=str
+        "-u", "--url", help="URLs to extract (separated by comma).", type=str
     )
     parser.add_argument(
         "--file_url",
-        help="File containing the URL to extract (one by line).",
+        help="File containing the URLs to extract (one by line).",
         type=str,
     )
     parser.add_argument(
         "--file_artist",
-        help="File containing the artist to extract (one by line).",
+        help="File containing the artists to extract (one by line).",
         type=str,
     )
     parser.add_argument(
         "-a",
         "--artist",
-        help="Artist to extract (separated by comma).",
+        help="Artists to extract (separated by comma).",
         type=str,
     )
     parser.add_argument(
@@ -142,7 +142,7 @@ def parse_args():
     parser.add_argument(
         "-c",
         "--complementary_infos",
-        help="Extract complementary_infos for each releases (slower, more requests on rym).",
+        help="Extract complementary informations for each releases (slower, more requests on rym).",
         action="store_true",
         dest="complementary_infos",
     )

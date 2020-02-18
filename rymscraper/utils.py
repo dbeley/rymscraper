@@ -167,7 +167,7 @@ def get_chart_row_infos(row):
     return dict_row
 
 
-def get_artist_disco(soup, complementary_infos):
+def get_artist_disco(browser, soup, complementary_infos):
     """Returns a list of dicts containing infos about an artist discography."""
 
     # artist discography

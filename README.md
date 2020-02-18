@@ -113,16 +113,16 @@ Scraper rateyourmusic (artist version).
 
 optional arguments:
   -h, --help            show this help message and exit
-  --debug               Display debugging information
-  -u URL, --url URL     URL to extract (separated by comma)
-  --file_url FILE_URL   File containing the URL to extract (one by line)
+  --debug               Display debugging information.
+  -u URL, --url URL     URLs of the artists to extract (separated by comma).
+  --file_url FILE_URL   File containing the URLs to extract (one by line).
   --file_artist FILE_ARTIST
-                        File containing the artist to extract (one by line)
+                        File containing the artists to extract (one by line).
   -a ARTIST, --artist ARTIST
-                        Artist to extract (separated by comma)
+                        Artists to extract (separated by comma).
   -s, --separate_export
-                        Also export the artists in separate files
-  --no_headless         Launch selenium in foreground (background by default)
+                        Also export the artists in separate files.
+  --no_headless         Launch selenium in foreground (background by default).
 ```
 
 ```
@@ -131,21 +131,24 @@ python get_chart.py -h
 
 ```
 usage: get_chart.py [-h] [--debug] [-u URL] [-g GENRE] [-y YEAR] [-c COUNTRY]
-                    [-e] [--no_headless]
+                    [-p PAGE] [-e] [--no_headless]
 
 Scraper rateyourmusic (chart version).
 
 optional arguments:
   -h, --help            show this help message and exit
-  --debug               Display debugging information
-  -u URL, --url URL     Chart URL to parse
+  --debug               Display debugging information.
+  -u URL, --url URL     Chart URL to parse.
   -g GENRE, --genre GENRE
-                        Genre (use + if you need a space)
-  -y YEAR, --year YEAR  Year
+                        Chart Option : Genre (use + if you need a space).
+  -y YEAR, --year YEAR  Chart Option : Year.
   -c COUNTRY, --country COUNTRY
-                        Country
-  -e, --everything      Everything (otherwise only albums)
-  --no_headless         Launch selenium in foreground (background by default)
+                        Chart Option : Country.
+  -p PAGE, --page PAGE  Number of page to extract. If not set, every pages
+                        will be extracted.
+  -e, --everything      Chart Option : Extract Everything / All Releases
+                        (otherwise only albums).
+  --no_headless         Launch selenium in foreground (background by default).
 ```
 
 ```
@@ -161,19 +164,19 @@ Scraper rateyourmusic (discography version).
 
 optional arguments:
   -h, --help            show this help message and exit
-  --debug               Display debugging information
-  -u URL, --url URL     URL to extract (separated by comma)
-  --file_url FILE_URL   File containing the URL to extract (one by line)
+  --debug               Display debugging information.
+  -u URL, --url URL     URLs to extract (separated by comma).
+  --file_url FILE_URL   File containing the URLs to extract (one by line).
   --file_artist FILE_ARTIST
-                        File containing the artist to extract (one by line)
+                        File containing the artists to extract (one by line).
   -a ARTIST, --artist ARTIST
-                        Artist to extract (separated by comma)
+                        Artists to extract (separated by comma).
   -s, --separate_export
-                        Also export the artists in separate files
+                        Also export the artists in separate files.
   -c, --complementary_infos
-                        Extract complementary_infos for each releases (slower,
-                        more requests on rym)
-  --no_headless         Launch selenium in foreground (background by default)
+                        Extract complementary informations for each releases
+                        (slower, more requests on rym).
+  --no_headless         Launch selenium in foreground (background by default).
 ```
 
 ```
@@ -189,16 +192,16 @@ Scraper rateyourmusic (album version).
 
 optional arguments:
   -h, --help            show this help message and exit
-  --debug               Display debugging information
-  -u URL, --url URL     URL to extract (separated by comma)
-  --file_url FILE_URL   File containing the URL to extract (one by line)
+  --debug               Display debugging information.
+  -u URL, --url URL     URL to extract (separated by comma).
+  --file_url FILE_URL   File containing the URLs to extract (one by line).
   --file_album_name FILE_ALBUM_NAME
                         File containing the name of the albums to extract (one
-                        by line, format Artist - Album)
+                        by line, format Artist - Album).
   -a ALBUM_NAME, --album_name ALBUM_NAME
-                        Album to extract (separated by comma, format Artist -
-                        Album)
+                        Albums to extract (separated by comma, format Artist -
+                        Album).
   -s, --separate_export
-                        Also export the artists in separate files
-  --no_headless         Launch selenium in foreground (background by default)
+                        Also export the artists in separate files.
+  --no_headless         Launch selenium in foreground (background by default).
 ```
