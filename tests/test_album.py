@@ -18,7 +18,7 @@ def test_album_infos(network):
         raise AssertionError()
 
     if not album_infos["Descriptors"].startswith(
-        "anxious,  energetic,  playful,  war"
+        "anxious,  playful,  energetic,  war"
     ):
         raise AssertionError()
 
