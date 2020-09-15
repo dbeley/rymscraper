@@ -8,3 +8,4 @@ tags
 *.csv
 *.log
 dist/
+__pycache__/

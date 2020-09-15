@@ -13,20 +13,22 @@ Warning : Be aware that an excessive usage of this can make your IP address bann
 - lxml
 - requests
 - pandas
-- selenium
+- selenium with geckodriver
 - tqdm
 
 ## Installation
 
-Installation in a virtualenv with pipenv (recommended)
+Classic installation
 
 ```
-pipenv install '-e .'
+python setup.py install
 ```
 
-Or you can simply install the package with
+Installation in a virtualenv with pipenv
 
 ```
+pipenv install
+pipenv shell
 python setup.py install
 ```
 
