@@ -2,6 +2,7 @@ import logging
 import re
 from tqdm import tqdm
 import difflib
+from bs4 import NavigableString
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +48,7 @@ def get_url_from_album_name(browser, name: str) -> str:
 def get_album_infos(soup):
     """Returns a dict containing infos from an album."""
     album_infos = {
-        "Name": soup.find("div", {"class": "album_title"})
-        .text.split("\n")[0]
-        .strip(),
+        "Name": soup.find("div", {"class": "album_title"}).text.split("\n")[0].strip(),
         "Artist": soup.find("div", {"class": "album_title"})
         .text.split("\n")[2]
         .strip()[3:],
@@ -72,9 +71,7 @@ def get_album_infos(soup):
 
 def get_artist_infos(soup):
     """Returns a dict containing infos from an artist."""
-    artist_infos = {
-        "Name": soup.find("h1", {"class": "artist_name_hdr"}).text.strip()
-    }
+    artist_infos = {"Name": soup.find("h1", {"class": "artist_name_hdr"}).text.strip()}
 
     artist_infos_descriptors = [
         x.text.strip()
@@ -87,7 +84,15 @@ def get_artist_infos(soup):
         for x in soup.find("div", {"class": "artist_info"}).find_all(
             "div", {"class": "info_hdr"}
         )
+        # Ignore new follow button, will fill it later
+        if not isinstance(x.nextSibling, NavigableString)
     ]
+    # append number of followers
+    artist_infos_values[-1] = (
+        soup.find("span", {"class": "label_num_followers"})
+        .text.replace(" followers", "")
+        .replace(",", "")
+    )
     for d, v in zip(artist_infos_descriptors, artist_infos_values):
         artist_infos[d] = v
 
@@ -103,17 +108,19 @@ def get_chart_row_infos(row):
     """Returns a dict containing infos from a chart row."""
     dict_row = {}
     try:
-        dict_row["Rank"] = row.find("span", {"class": "ooookiig"}).text
+        dict_row["Rank"] = row.find(
+            "div", {"class": "topcharts_position"}
+        ).text.replace(".", "")
     except Exception as e:
         logger.error("Rank : %s", e)
         dict_row["Rank"] = "NA"
     try:
-        dict_row["Artist"] = row.find("a", {"class": "artist"}).text
+        dict_row["Artist"] = row.find("div", {"class": "topcharts_item_artist"}).text
     except Exception as e:
         logger.error("Artist: %s", e)
         dict_row["Artist"] = "NA"
     try:
-        dict_row["Album"] = row.find("a", {"class": "album"}).text
+        dict_row["Album"] = row.find("div", {"class": "topcharts_item_title"}).text
         logger.debug(
             "%s - %s - %s",
             dict_row["Rank"],
@@ -125,7 +132,7 @@ def get_chart_row_infos(row):
         dict_row["Album"] = "NA"
     try:
         dict_row["Date"] = (
-            row.find("div", {"class": "chart_year"})
+            row.find("div", {"class": "topcharts_item_releasedate"})
             .text.replace("(", "")
             .replace(")", "")
             .strip()
@@ -138,7 +145,7 @@ def get_chart_row_infos(row):
             [
                 x.text
                 for x in row.find(
-                    "div", {"class": "chart_detail_line3"}
+                    "div", {"class": "topcharts_item_genres_container"}
                 ).find_all("a", {"class": "genre"})
             ]
         )
@@ -146,19 +153,15 @@ def get_chart_row_infos(row):
         logger.error("Genres : %s", e)
         dict_row["Genres"] = "NA"
     try:
-        ratings = [
-            x.strip()
-            for x in row.find("div", {"class": "chart_stats"})
-            .find("a")
-            .text.split("|")
-        ]
-        dict_row["RYM Rating"] = ratings[0].replace("RYM Rating: ", "")
-        dict_row["Ratings"] = (
-            ratings[1].replace("Ratings: ", "").replace(",", "")
-        )
-        dict_row["Reviews"] = (
-            ratings[2].replace("Reviews: ", "").replace(",", "")
-        )
+        dict_row["RYM Rating"] = row.find(
+            "span", {"class": "topcharts_avg_rating_stat"}
+        ).text
+        dict_row["Ratings"] = row.find(
+            "span", {"class": "topcharts_ratings_stat"}
+        ).text.replace(",", "")
+        dict_row["Reviews"] = row.find(
+            "span", {"class": "topcharts_reviews_stat"}
+        ).text.replace(",", "")
     except Exception as e:
         logger.error("Ratings : %s", e)
         dict_row["RYM Ratings"] = "NA"
@@ -200,20 +203,16 @@ def get_artist_disco(browser, soup, complementary_infos):
                 "URL": url_disc,
                 "Date": date["title"].strip(),
                 "Year": date.text.strip(),
-                "Average Rating": disc.find(
-                    "div", {"class": "disco_avg_rating"}
-                ).text,
-                "Ratings": disc.find(
-                    "div", {"class": "disco_ratings"}
-                ).text.replace(",", ""),
-                "Reviews": disc.find(
-                    "div", {"class": "disco_reviews"}
-                ).text.replace(",", ""),
+                "Average Rating": disc.find("div", {"class": "disco_avg_rating"}).text,
+                "Ratings": disc.find("div", {"class": "disco_ratings"}).text.replace(
+                    ",", ""
+                ),
+                "Reviews": disc.find("div", {"class": "disco_reviews"}).text.replace(
+                    ",", ""
+                ),
             }
             if complementary_infos:
-                dict_disc = get_complementary_infos_disc(
-                    browser, dict_disc, url_disc
-                )
+                dict_disc = get_complementary_infos_disc(browser, dict_disc, url_disc)
             artist_disco.append(dict_disc)
     return artist_disco
 
@@ -226,9 +225,7 @@ def get_complementary_infos_disc(browser, dict_disc, url_disc):
         soup = browser.get_soup()
         dict_complementary = {}
         table = soup.find("table", {"class": "album_info"})
-        table_descriptors = [
-            x.find("th").text.strip() for x in table.find_all("tr")
-        ]
+        table_descriptors = [x.find("th").text.strip() for x in table.find_all("tr")]
         table_values = [
             " ".join(x.find("td").text.strip().replace("\n", ", ").split())
             for x in table.find_all("tr")

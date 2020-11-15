@@ -7,7 +7,9 @@ import os
     reason="doesn't work with Travis",
 )
 def test_album_infos(network):
-    url_album = "https://rateyourmusic.com/release/album/everything-everything/get-to-heaven-2/"
+    url_album = (
+        "https://rateyourmusic.com/release/album/everything-everything/get-to-heaven-2/"
+    )
 
     album_infos = network.get_album_infos(url_album)
 
@@ -18,7 +20,7 @@ def test_album_infos(network):
         raise AssertionError()
 
     if not album_infos["Descriptors"].startswith(
-        "energetic,  anxious,  playful,  satirical"
+        "anxious,  energetic,  playful,  conscious,  satirical"
     ):
         raise AssertionError()
 

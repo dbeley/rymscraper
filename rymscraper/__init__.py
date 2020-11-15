@@ -3,7 +3,7 @@ from typing import List, Dict
 from rymscraper import RymBrowser, utils
 
 logger = logging.getLogger(__name__)
-__version__ = "0.1"
+__version__ = "0.2.0"
 name = "rymscraper"
 
 
@@ -72,9 +72,7 @@ class RymNetwork:
 
         return list_artists_infos
 
-    def get_chart_infos(
-        self, url: str = None, max_page: int = None
-    ) -> List[Dict]:
+    def get_chart_infos(self, url: str = None, max_page: int = None) -> List[Dict]:
         """Returns a list of dicts containing chart infos.
 
         Parameters:
@@ -96,10 +94,16 @@ class RymNetwork:
                 soup = self.browser.get_soup()
 
                 # table containing albums
-                if soup.find("table", {"class": "mbgen"}):
+                if soup.find(
+                    "div", {"class": "chart_results chart_results_ charts_page"}
+                ):
                     logger.debug("Table class mbgen found")
-                    table = soup.find("table", {"class": "mbgen"})
-                    rows = table.find_all("tr")
+                    table = soup.find(
+                        "div", {"class": "chart_results chart_results_ charts_page"}
+                    )
+                    rows = table.find_all(
+                        "div", {"class": "topcharts_itembox chart_item_release"}
+                    )
                     if len(rows) == 0:
                         logger.debug("No rows extracted. Exiting")
                         break

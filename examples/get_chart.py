@@ -19,28 +19,26 @@ def main():
 
     if not args.url:
         url = RymUrl.RymUrl()
-        export_filename = f"{export_directory}/export_chart"
+        export_filename = f"{export_directory}/export_chart_{int(time.time())}"
         logger.debug("rym_url : %s.", url)
 
         if args.everything:
             export_filename += f"_everything"
-            url.url_part_type += f"everything"
+            url.url_part_type = f"/release"
         else:
             export_filename += f"_album"
-            url.url_part_type += f"album"
         if args.year:
             export_filename += f"_{args.year}"
-            url.url_part_year += f"{args.year}"
+            url.url_part_year = f"/{args.year}"
         if args.genre:
             export_filename += f"_{args.genre}"
-            url.url_part_genres += f"{args.genre}"
+            url.url_part_genres = f"/g:{args.genre}"
         if args.country:
             export_filename += f"_{args.country}"
-            url.url_part_origin_countries += f"{args.country}"
+            url.url_part_origin_countries = f"/loc:{args.country}"
     else:
-        url = RymUrl.RymUrl()
-        url.url_page_separator = "/"
-        export_filename = f"{export_directory}/export_url"
+        url = args.url
+        export_filename = f"{export_directory}/export_url_{int(time.time())}"
 
     logger.debug("completed rym_url : %s.", url)
 
@@ -87,12 +85,20 @@ def parse_args():
     parser.add_argument(
         "-g",
         "--genre",
-        help="Chart Option : Genre (use + if you need a space).",
+        help="Chart Option : Genre. Use '+' if you need a space, multiple genres selection is supported (example: 'genre1,genre2').",
         type=str,
     )
-    parser.add_argument("-y", "--year", help="Chart Option : Year.", type=str)
     parser.add_argument(
-        "-c", "--country", help="Chart Option : Country.", type=str
+        "-y",
+        "--year",
+        help="Chart Option : Year. Ranges are supported ('2004-2008'), as well as decades ('2010s').",
+        type=str,
+    )
+    parser.add_argument(
+        "-c",
+        "--country",
+        help="Chart Option : Country. Multiple countries selection is supported (example: 'country1,country2').",
+        type=str,
     )
     parser.add_argument(
         "-p",
