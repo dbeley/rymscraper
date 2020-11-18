@@ -6,6 +6,12 @@ from bs4 import NavigableString
 
 logger = logging.getLogger(__name__)
 
+def get_close_matches_icase(word, possibilities, *args, **kwargs):
+    """ Case-insensitive version of difflib.get_close_matches """
+    lword = word.lower()
+    lpos = {p.lower(): p for p in possibilities}
+    lmatch = difflib.get_close_matches(lword, lpos.keys(), *args, **kwargs)
+    return [lpos[m] for m in lmatch]
 
 def get_url_from_artist_name(browser, artist: str) -> str:
     """Returns the url of the first result for an name on rateyourmusic."""
@@ -38,7 +44,7 @@ def get_url_from_album_name(browser, name: str) -> str:
 
     url_match = artist_album_url[
         artist_album_name.index(
-            difflib.get_close_matches(album_name, artist_album_name)[0]
+            get_close_matches_icase(album_name, artist_album_name)[0]
         )
     ]
     logger.debug("Best match : %s", url_match)
