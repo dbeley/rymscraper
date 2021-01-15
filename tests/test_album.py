@@ -19,8 +19,12 @@ def test_album_infos(network):
     if album_infos["Artist"] != "Everything Everything":
         raise AssertionError()
 
-    if not album_infos["Descriptors"].startswith(
-        "anxious,  energetic,  playful,  conscious,  satirical"
+    if not (
+        all(
+            x
+            for x in ["anxious", "energetic", "playful", "conscious", "satirical"]
+            if x in album_infos["Descriptors"]
+        )
     ):
         raise AssertionError()
 

@@ -4,7 +4,6 @@ Exports/
 .venv/
 *.egg-info/
 tags
-*.txt
 *.csv
 *.log
 dist/
