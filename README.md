@@ -45,11 +45,13 @@ network = rymscraper.RymNetwork()
 
 # artist
 artist_infos = network.get_artist_infos(name="Daft Punk")
+# or network.get_artist_infos(url="https://rateyourmusic.com/artist/daft-punk")
 # you can easily convert all returned values to a pandas dataframe
 df = pd.DataFrame([artist_infos])
 
 # several artists
-list_artists_infos = network.get_artists_infos(names=["Air", "Bonobo", "Aphex Twin", "M83"])
+list_artists_infos = network.get_artists_infos(names=["Air", "M83"])
+# or network.get_artists_infos(urls=["https://rateyourmusic.com/artist/air", "https://rateyourmusic.com/artist/m83"])
 df = pd.DataFrame(list_artists_infos)
 
 # chart (slow for very long charts)
@@ -59,15 +61,18 @@ df = pd.DataFrame(chart_infos)
 
 # discography
 discography_infos = network.get_discography_infos(name="Aufgang", complementary_infos=True)
+# or network.get_discography_infos(url="https://rateyourmusic.com/artist/aufgang")
 df = pd.DataFrame.from_records(discography_infos)
 
 # album
 # name field should use the format Artist - Album name (not ideal but it works for now)
 album_infos = network.get_album_infos(name="XTC - Black Sea")
+# or network.get_album_infos(url="https://rateyourmusic.com/release/album/xtc/black-sea/")
 df = pd.DataFrame([album_infos])
 
 # several albums
-list_album_infos = network.get_albums_infos(names=["Ride - Nowhere", "Electrelane - Axes", "Stereolab - Dots and Loops", "Blur - The Great Escape"])
+list_album_infos = network.get_albums_infos(names=["Ride - Nowhere", "Electrelane - Axes"])
+# or network.get_albums_infos(urls=["https://rateyourmusic.com/release/album/ride/nowhere/", "https://rateyourmusic.com/release/album/electrelane/axes/"])
 df = pd.DataFrame(list_album_infos)
 
 # timeline
@@ -76,7 +81,7 @@ df = pd.DataFrame(album_timeline)
 df["Date"] = df["Date"].apply(lambda x: datetime.datetime.strptime(x, "%d %b %Y"))
 df["Date"].groupby(df["Date"].dt.to_period("D")).count().plot(kind="bar")
 ```
-Number of ratings by day:
+Number of ratings per day:
 
 ![timeline_plot](https://github.com/dbeley/rymscraper/blob/master/docs/timeline.png?raw=true)
 
