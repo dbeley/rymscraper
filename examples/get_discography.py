@@ -16,9 +16,7 @@ def main():
 
     # arguments parsing
     if not any([args.url, args.artist, args.file_url, args.file_artist]):
-        logger.error(
-            "Not enought arguments. Use -h to see available arguments."
-        )
+        logger.error("Not enough arguments. Use -h to see available arguments.")
         exit()
     list_artists = None
     list_urls = None
@@ -49,9 +47,7 @@ def main():
         except Exception as e:
             logger.error(e)
             exit()
-        logger.debug(
-            "Option file_artist found, list_artists : %s.", list_artists
-        )
+        logger.debug("Option file_artist found, list_artists : %s.", list_artists)
 
     # # starting selenium browser
     RymNetwork = rymscraper.RymNetwork(headless=args.no_headless)
@@ -72,9 +68,7 @@ def main():
     export_directory = "Exports"
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
-    export_filename = (
-        f"{export_directory}/export_discography_{int(time.time())}"
-    )
+    export_filename = f"{export_directory}/{int(time.time())}_export_discography"
 
     # columns = ['Artist',
     #            'Name',

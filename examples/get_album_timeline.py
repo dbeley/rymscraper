@@ -66,19 +66,12 @@ def parse_args():
         type=str,
     )
     parser.add_argument(
-        "-s",
-        "--separate_export",
-        help="Also export the artists in separate files.",
-        action="store_true",
-        dest="separate_export",
-    )
-    parser.add_argument(
         "--no_headless",
         help="Launch selenium in foreground (background by default).",
         action="store_false",
         dest="no_headless",
     )
-    parser.set_defaults(separate_export=False, no_headless=True)
+    parser.set_defaults(no_headless=True)
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel)

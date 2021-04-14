@@ -1,10 +1,13 @@
 import logging
 import re
+import time
 from tqdm import tqdm
 import difflib
-from bs4 import NavigableString
+from bs4 import BeautifulSoup, NavigableString, element
+from typing import List
 
 logger = logging.getLogger(__name__)
+
 
 def get_close_matches_icase(word, possibilities, *args, **kwargs):
     """ Case-insensitive version of difflib.get_close_matches """
@@ -12,6 +15,7 @@ def get_close_matches_icase(word, possibilities, *args, **kwargs):
     lpos = {p.lower(): p for p in possibilities}
     lmatch = difflib.get_close_matches(lword, lpos.keys(), *args, **kwargs)
     return [lpos[m] for m in lmatch]
+
 
 def get_url_from_artist_name(browser, artist: str) -> str:
     """Returns the url of the first result for an name on rateyourmusic."""
@@ -51,7 +55,7 @@ def get_url_from_album_name(browser, name: str) -> str:
     return url_match
 
 
-def get_album_infos(soup):
+def get_album_infos(soup: BeautifulSoup) -> dict:
     """Returns a dict containing infos from an album."""
     album_infos = {
         "Name": soup.find("div", {"class": "album_title"}).text.split("\n")[0].strip(),
@@ -75,7 +79,46 @@ def get_album_infos(soup):
     return album_infos
 
 
-def get_artist_infos(soup):
+def parse_catalog_line(row: element.Tag) -> dict:
+    return {
+        "Date": row.find("div", {"class": "catalog_date"}).text.strip(),
+        "User": row.find("span", {"class": "catalog_user"}).text.strip(),
+    }
+
+
+def get_album_timeline(browser) -> List[dict]:
+    """Returns a list of dict containing the timeline of the notes of an album."""
+    catalog_list = []
+    while True:
+        soup = browser.get_soup()
+        catalog_lines = soup.find(
+            "div", {"class": "catalog_list", "id": "catalog_list"}
+        )
+        # navspan = catalog_list.find("span", {"class": "navspan"})
+        catalog_list += [
+            parse_catalog_line(x)
+            for x in catalog_lines.findAll("div", {"class": "catalog_line"})
+        ]
+        # if navspan.find("span", {"class": "navlinknext"}):
+        # find_element_by_class_name("fc-cta-consent").click()
+        if (
+            len(
+                browser.find_element_by_class_name(
+                    "catalog_section"
+                ).find_elements_by_class_name("navlinknext")
+            )
+            == 0
+        ):
+            break
+        browser.find_element_by_class_name(
+            "catalog_section"
+        ).find_element_by_class_name("navlinknext").click()
+        logger.debug("Extracting timeline : %s items found.", len(catalog_list))
+        time.sleep(2)
+    return catalog_list
+
+
+def get_artist_infos(soup: BeautifulSoup) -> dict:
     """Returns a dict containing infos from an artist."""
     artist_infos = {"Name": soup.find("h1", {"class": "artist_name_hdr"}).text.strip()}
 
@@ -110,7 +153,7 @@ def get_artist_infos(soup):
     return artist_infos
 
 
-def get_chart_row_infos(row):
+def get_chart_row_infos(row: element.Tag) -> dict:
     """Returns a dict containing infos from a chart row."""
     dict_row = {}
     try:
@@ -176,7 +219,9 @@ def get_chart_row_infos(row):
     return dict_row
 
 
-def get_artist_disco(browser, soup, complementary_infos):
+def get_artist_disco(
+    browser, soup: BeautifulSoup, complementary_infos: bool
+) -> List[dict]:
     """Returns a list of dicts containing infos about an artist discography."""
 
     # artist discography
@@ -223,7 +268,7 @@ def get_artist_disco(browser, soup, complementary_infos):
     return artist_disco
 
 
-def get_complementary_infos_disc(browser, dict_disc, url_disc):
+def get_complementary_infos_disc(browser, dict_disc: dict, url_disc: str) -> dict:
     """Returns a dict containing complementary informations for a disc."""
     try:
         # complementary infos

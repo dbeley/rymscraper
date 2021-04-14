@@ -17,7 +17,7 @@ def main():
     # arguments parsing
     if not any([args.url, args.artist, args.file_url, args.file_artist]):
         logger.error(
-            "Not enought arguments. Use -h to see available arguments."
+            "Not enough arguments. Use -h to see available arguments."
         )
         exit()
     list_urls = None
@@ -64,7 +64,7 @@ def main():
     export_directory = "Exports"
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
-    export_filename = f"{export_directory}/export_artist_{int(time.time())}"
+    export_filename = f"{export_directory}/{int(time.time())}_export_artist"
 
     RymNetwork.browser.close()
     RymNetwork.browser.quit()

@@ -19,7 +19,7 @@ def main():
 
     if not args.url:
         url = RymUrl.RymUrl()
-        export_filename = f"{export_directory}/export_chart_{int(time.time())}"
+        export_filename = f"{export_directory}/{int(time.time())}_export_chart"
         logger.debug("rym_url : %s.", url)
 
         if args.everything:
@@ -38,7 +38,7 @@ def main():
             url.url_part_origin_countries = f"/loc:{args.country}"
     else:
         url = args.url
-        export_filename = f"{export_directory}/export_url_{int(time.time())}"
+        export_filename = f"{export_directory}/{int(time.time())}_export_url"
 
     logger.debug("completed rym_url : %s.", url)
 

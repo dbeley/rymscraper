@@ -16,12 +16,8 @@ def main():
     args = parse_args()
 
     # arguments parsing
-    if not any(
-        [args.url, args.album_name, args.file_url, args.file_album_name]
-    ):
-        logger.error(
-            "Not enought arguments. Use -h to see available arguments."
-        )
+    if not any([args.url, args.album_name, args.file_url, args.file_album_name]):
+        logger.error("Not enough arguments. Use -h to see available arguments.")
         exit()
     list_urls = None
     list_albums = None
@@ -41,9 +37,7 @@ def main():
             exit()
         logger.debug("Option file_url found, list_urls : %s.", list_urls)
     if args.album_name:
-        list_albums = [
-            x.strip() for x in args.album_name.split(",") if x.strip()
-        ]
+        list_albums = [x.strip() for x in args.album_name.split(",") if x.strip()]
         logger.debug("Option album_name found, list_albums : %s.", list_albums)
     if args.file_album_name:
         try:
@@ -54,9 +48,7 @@ def main():
         except Exception as e:
             logger.error(e)
             exit()
-        logger.debug(
-            "Option file_album_name found, list_albums : %s.", list_albums
-        )
+        logger.debug("Option file_album_name found, list_albums : %s.", list_albums)
 
     RymNetwork = rymscraper.RymNetwork(headless=args.no_headless)
     logger.info("Extracting albums infos.")
@@ -69,7 +61,7 @@ def main():
     export_directory = "Exports"
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
-    export_filename = f"{export_directory}/export_album_{int(time.time())}"
+    export_filename = f"{export_directory}/{int(time.time())}_export_album"
 
     RymNetwork.browser.close()
     RymNetwork.browser.quit()

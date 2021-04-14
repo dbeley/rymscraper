@@ -25,17 +25,17 @@ class RymBrowser(webdriver.Firefox):
         while True:
             self.get(str(url))
             # Click on the cookie bar if found.
-            try:
+            if len(self.find_elements_by_class_name("as-oil__btn-optin")) > 0:
                 self.find_element_by_class_name("as-oil__btn-optin").click()
                 logger.debug("Cookie bar found. Clicking on ok.")
-            except Exception as e:
-                logger.debug("Cookie bar not found, %s", e)
+            # Click on the consent popu if found.
+            if len(self.find_elements_by_class_name("fc-cta-consent")) > 0:
+                self.find_element_by_class_name("fc-cta-consent").click()
+                logger.debug("Consent popup found. Clicking on ok.")
             # Show all releases by clicking on all "Show all" links.
             try:
                 for index, link in enumerate(
-                    self.find_elements_by_class_name(
-                        "disco_expand_section_link"
-                    )
+                    self.find_elements_by_class_name("disco_expand_section_link")
                 ):
                     self.execute_script(
                         f"document.getElementsByClassName('disco_expand_section_link')[{index}].scrollIntoView(true);"

@@ -47,6 +47,40 @@ class RymNetwork:
 
         return list_albums_infos
 
+    def get_album_timeline(self, url: str = None, name: str = None) -> Dict:
+        """Returns a dict containing timeline for an album.
+
+        Parameters:
+            url: Url of the album.
+            name: Name of the album in the "Artist - Album" format.
+
+        Returns:
+            album_timeline: Dict containing album timeline.
+
+        """
+        if name:
+            url = utils.get_url_from_album_name(self.browser, name)
+        if not url:
+            raise Exception("Invalid url or name. Exiting.")
+
+        logger.info("Extracting album timeline for %s.", url)
+        self.browser.get_url(url)
+        album_infos = utils.get_album_timeline(self.browser)
+        return album_infos
+
+    def get_albums_timeline(
+        self, urls: List[str] = None, names: List[str] = None
+    ) -> List[Dict]:
+        """Returns a list of dicts containing timeline from several albums."""
+        if names:
+            list_albums_timeline = [self.get_album_timeline(name=x) for x in names]
+        elif urls:
+            list_albums_timeline = [self.get_album_timeline(url=x) for x in urls]
+        else:
+            raise Exception("No list of urls or names entered. Exiting.")
+
+        return list_albums_timeline
+
     def get_artist_infos(self, url: str = None, name: str = None) -> Dict:
         """Returns a dict containing artist infos."""
         if name:

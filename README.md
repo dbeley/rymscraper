@@ -36,7 +36,7 @@ python setup.py install
 
 The data format used by the library is the python dict. It can be easily converted to CSV or JSON.
 
-```
+```python
 import rymscraper
 import pandas as pd
 from rymscraper import RymUrl
@@ -70,6 +70,16 @@ df = pd.DataFrame([album_infos])
 list_album_infos = network.get_albums_infos(names=["Ride - Nowhere", "Electrelane - Axes", "Stereolab - Dots and Loops", "Blur - The Great Escape"])
 df = pd.DataFrame(list_album_infos)
 
+# timeline
+album_timeline = network.get_album_timeline(url="https://rateyourmusic.com/release/album/feu-chatterton/palais-dargile/")
+df = pd.DataFrame(album_timeline)
+df["Date"] = df["Date"].apply(lambda x: datetime.datetime.strptime(x, "%d %b %Y"))
+df["Date"].groupby(df["Date"].dt.to_period("D")).count().plot(kind="bar")
+```
+
+![timeline_plot](https://github.com/dbeley/rymscraper/blob/master/docs/timeline.png?raw=true)
+
+```python
 # don't forget to close and quit the browser (prevent memory leaks)
 network.browser.close()
 network.browser.quit()
@@ -83,6 +93,7 @@ Some scripts are included in the examples folder.
 - get_chart.py : extract albums information appearing in a chart by name, year or url in a csv file.
 - get_discography.py : extract the discography of one or several artists by name or url in a csv file.
 - get_album_infos.py : extract informations about one or several albums by name or url in a csv file.
+- get_album_timeline.py : extract the timeline of an album into a json file.
 
 ### Usage
 
@@ -98,6 +109,9 @@ python get_discography.py -a "the new pornographers, ween, stereolab" --compleme
 
 python get_album_infos.py -a "ride - nowhere"
 python get_album_infos.py --file_url urls_list.txt --no_headless
+
+python get_album_timeline.py -a "ride - nowhere"
+python get_album_timeline.py -u "https://rateyourmusic.com/release/album/feu-chatterton/palais-dargile/"
 ```
 
 ### Help
@@ -205,5 +219,24 @@ optional arguments:
                         Album).
   -s, --separate_export
                         Also export the artists in separate files.
+  --no_headless         Launch selenium in foreground (background by default).
+```
+
+```
+python get_album_timeline.py -h
+```
+
+```
+usage: get_album_timeline.py [-h] [--debug] [-u URL] [-a ALBUM_NAME]
+                             [--no_headless]
+
+Scraper rateyourmusic (album timeline version).
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --debug               Display debugging information.
+  -u URL, --url URL     URL to extract.
+  -a ALBUM_NAME, --album_name ALBUM_NAME
+                        Album to extract (format Artist - Album).
   --no_headless         Launch selenium in foreground (background by default).
 ```
