@@ -53,7 +53,7 @@ list_artists_infos = network.get_artists_infos(names=["Air", "Bonobo", "Aphex Tw
 df = pd.DataFrame(list_artists_infos)
 
 # chart (slow for very long charts)
-rym_url = RymUrl.RymUrl()
+rym_url = RymUrl.RymUrl() # default: top of all-time. See RymUrl.py source code for more optiosn.
 chart_infos = network.get_chart_infos(rym_url=rym_url, max_page=3)
 df = pd.DataFrame(chart_infos)
 
@@ -76,6 +76,7 @@ df = pd.DataFrame(album_timeline)
 df["Date"] = df["Date"].apply(lambda x: datetime.datetime.strptime(x, "%d %b %Y"))
 df["Date"].groupby(df["Date"].dt.to_period("D")).count().plot(kind="bar")
 ```
+Number of ratings by day:
 
 ![timeline_plot](https://github.com/dbeley/rymscraper/blob/master/docs/timeline.png?raw=true)
 
