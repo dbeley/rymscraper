@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_close_matches_icase(word, possibilities, *args, **kwargs):
-    """ Case-insensitive version of difflib.get_close_matches """
+    """Case-insensitive version of difflib.get_close_matches"""
     lword = word.lower()
     lpos = {p.lower(): p for p in possibilities}
     lmatch = difflib.get_close_matches(lword, lpos.keys(), *args, **kwargs)
@@ -94,13 +94,10 @@ def get_album_timeline(browser) -> List[dict]:
         catalog_lines = soup.find(
             "div", {"class": "catalog_list", "id": "catalog_list"}
         )
-        # navspan = catalog_list.find("span", {"class": "navspan"})
         catalog_list += [
             parse_catalog_line(x)
             for x in catalog_lines.findAll("div", {"class": "catalog_line"})
         ]
-        # if navspan.find("span", {"class": "navlinknext"}):
-        # find_element_by_class_name("fc-cta-consent").click()
         if (
             len(
                 browser.find_element_by_class_name(
@@ -271,7 +268,6 @@ def get_artist_disco(
 def get_complementary_infos_disc(browser, dict_disc: dict, url_disc: str) -> dict:
     """Returns a dict containing complementary informations for a disc."""
     try:
-        # complementary infos
         browser.get_url(url_disc)
         soup = browser.get_soup()
         dict_complementary = {}

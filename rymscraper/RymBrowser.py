@@ -28,7 +28,7 @@ class RymBrowser(webdriver.Firefox):
             if len(self.find_elements_by_class_name("as-oil__btn-optin")) > 0:
                 self.find_element_by_class_name("as-oil__btn-optin").click()
                 logger.debug("Cookie bar found. Clicking on ok.")
-            # Click on the consent popu if found.
+            # Click on the consent popup if found.
             if len(self.find_elements_by_class_name("fc-cta-consent")) > 0:
                 self.find_element_by_class_name("fc-cta-consent").click()
                 logger.debug("Consent popup found. Clicking on ok.")

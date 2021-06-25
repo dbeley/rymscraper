@@ -3,7 +3,7 @@ from typing import List, Dict
 from rymscraper import RymBrowser, utils
 
 logger = logging.getLogger(__name__)
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 name = "rymscraper"
 
 
@@ -197,7 +197,7 @@ class RymNetwork:
         names: List[str] = None,
         complementary_infos: bool = False,
     ) -> List[Dict]:
-        """Returns a list of dicts containing infos from several discographies."""
+        """Returns a list of dicts containing infos from several discography."""
         if names:
             list_artists_discos = []
             for name in names:
