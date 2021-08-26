@@ -30,5 +30,6 @@ class RymUrl:
             # + self.url_part_countries
             + self.page_separator
             + str(self.page)
+            + '/'
         )
         return final_url

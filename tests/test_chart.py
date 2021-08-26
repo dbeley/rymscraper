@@ -9,16 +9,22 @@ from rymscraper import RymUrl
 )
 def test_chart_infos(network):
     url = RymUrl.RymUrl()
+    page_size = 40
+    max_page = 2
 
-    chart_infos = network.get_chart_infos(url, max_page=1)
+    chart_infos = network.get_chart_infos(url, max_page=max_page)
     print(len(chart_infos))
 
-    if not len(chart_infos) == 40:
+    if not len(chart_infos) == max_page * page_size:
         raise AssertionError()
 
     first_item = chart_infos[0]
+    second_page_item = chart_infos[page_size]
 
     if not first_item["Rank"] == "1":
+        raise AssertionError()
+
+    if not second_page_item["Rank"] == str(page_size + 1):
         raise AssertionError()
 
     if not first_item["Artist"] == "Radiohead":
@@ -34,8 +40,8 @@ def test_chart_infos(network):
         raise AssertionError()
 
     if (
-        not isinstance(first_item["RYM Rating"], str)
-        and "." in first_item["RYM Rating"]
+            not isinstance(first_item["RYM Rating"], str)
+            and "." in first_item["RYM Rating"]
     ):
         raise AssertionError()
 

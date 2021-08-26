@@ -4,7 +4,7 @@ from rymscraper import RymUrl
 def test_RymUrlSimple():
     RymUrlTest = RymUrl.RymUrl()
     print(str(RymUrlTest))
-    if str(RymUrlTest) != "https://rateyourmusic.com/charts/top/album/1":
+    if str(RymUrlTest) != "https://rateyourmusic.com/charts/top/album/1/":
         raise AssertionError()
 
 
@@ -17,6 +17,6 @@ def test_RymUrlAdvanced():
     print(str(RymUrlTest))
     if (
         str(RymUrlTest)
-        != "https://rateyourmusic.com/charts/top/release/2010s/g:rock/loc:france/1"
+        != "https://rateyourmusic.com/charts/top/release/2010s/g:rock/loc:france/1/"
     ):
         raise AssertionError()
