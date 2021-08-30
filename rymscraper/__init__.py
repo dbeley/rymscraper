@@ -151,7 +151,7 @@ class RymNetwork:
                     break
 
                 # link to the next page
-                if soup.find("a", {"class": "navlinknext"}):
+                if soup.find("a", {"class": "ui_pagination_next"}):
                     logger.debug("Next page found")
                     if max_page and url.page == max_page:
                         break
@@ -198,8 +198,8 @@ class RymNetwork:
         complementary_infos: bool = False,
     ) -> List[Dict]:
         """Returns a list of dicts containing infos from several discography."""
+        list_artists_discos = []
         if names:
-            list_artists_discos = []
             for name in names:
                 artist_disco = self.get_discography_infos(
                     name=name, complementary_infos=complementary_infos
