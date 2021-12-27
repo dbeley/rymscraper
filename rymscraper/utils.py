@@ -4,6 +4,7 @@ import time
 from tqdm import tqdm
 import difflib
 from bs4 import BeautifulSoup, NavigableString, element
+from selenium.webdriver.common.by import By
 from typing import List
 
 logger = logging.getLogger(__name__)
@@ -100,16 +101,16 @@ def get_album_timeline(browser) -> List[dict]:
         ]
         if (
             len(
-                browser.find_element_by_class_name(
-                    "catalog_section"
-                ).find_elements_by_class_name("navlinknext")
+                browser.find_element(By.CLASS_NAME, "catalog_section").find_elements(
+                    By.CLASS_NAME, "navlinknext"
+                )
             )
             == 0
         ):
             break
-        browser.find_element_by_class_name(
-            "catalog_section"
-        ).find_element_by_class_name("navlinknext").click()
+        browser.find_element(By.CLASS_NAME, "catalog_section").find_element(
+            By.CLASS_NAME, "navlinknext"
+        ).click()
         logger.debug("Extracting timeline : %s items found.", len(catalog_list))
         time.sleep(2)
     return catalog_list

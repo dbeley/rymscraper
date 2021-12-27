@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "*"
+mypy = "*"
 
 [packages]
 requests = "*"
@@ -13,6 +14,7 @@ beautifulsoup4 = "*"
 lxml = "*"
 selenium = "*"
 tqdm = "*"
+bs4 = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"

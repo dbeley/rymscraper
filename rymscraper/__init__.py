@@ -1,6 +1,6 @@
 import logging
-from typing import List, Dict
-from rymscraper import RymBrowser, utils
+from typing import List, Dict, Optional
+from rymscraper import RymBrowser, RymUrl, utils
 
 logger = logging.getLogger(__name__)
 __version__ = "0.2.1"
@@ -47,7 +47,7 @@ class RymNetwork:
 
         return list_albums_infos
 
-    def get_album_timeline(self, url: str = None, name: str = None) -> Dict:
+    def get_album_timeline(self, url: str = None, name: str = None) -> List[dict]:
         """Returns a dict containing timeline for an album.
 
         Parameters:
@@ -70,7 +70,7 @@ class RymNetwork:
 
     def get_albums_timeline(
         self, urls: List[str] = None, names: List[str] = None
-    ) -> List[Dict]:
+    ) -> List[List[Dict]]:
         """Returns a list of dicts containing timeline from several albums."""
         if names:
             list_albums_timeline = [self.get_album_timeline(name=x) for x in names]
@@ -78,7 +78,6 @@ class RymNetwork:
             list_albums_timeline = [self.get_album_timeline(url=x) for x in urls]
         else:
             raise Exception("No list of urls or names entered. Exiting.")
-
         return list_albums_timeline
 
     def get_artist_infos(self, url: str = None, name: str = None) -> Dict:
@@ -106,7 +105,9 @@ class RymNetwork:
 
         return list_artists_infos
 
-    def get_chart_infos(self, url: str = None, max_page: int = None) -> List[Dict]:
+    def get_chart_infos(
+        self, url: Optional[str] = None, max_page: int = None
+    ) -> List[Dict]:
         """Returns a list of dicts containing chart infos.
 
         Parameters:
