@@ -3,7 +3,7 @@ import logging
 import time
 import argparse
 from pathlib import Path
-import rymscraper
+from rymscraper import rymscraper
 import json
 
 logger = logging.getLogger()

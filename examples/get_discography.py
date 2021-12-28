@@ -3,7 +3,7 @@ import time
 import argparse
 import pandas as pd
 from pathlib import Path
-import rymscraper
+from rymscraper import rymscraper
 
 logger = logging.getLogger()
 logging.getLogger("urllib3").setLevel(logging.WARNING)

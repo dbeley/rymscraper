@@ -1,9 +1,9 @@
+import logging
+import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-import logging
-import time
 
 logger = logging.getLogger(__name__)
 
@@ -25,26 +25,28 @@ class RymBrowser(webdriver.Firefox):
         logger.debug("get_url(browser, %s)", url)
         while True:
             self.get(str(url))
-            # Click on the cookie bar if found.
-            if len(self.find_elements(By.CLASS_NAME, "as-oil__btn-optin")) > 0:
-                self.find_element(By.CLASS_NAME, "as-oil__btn-optin").click()
-                logger.debug("Cookie bar found. Clicking on ok.")
-            # Click on the consent popup if found.
-            if len(self.find_elements(By.CLASS_NAME, "fc-cta-consent")) > 0:
-                self.find_element(By.CLASS_NAME, "fc-cta-consent").click()
-                logger.debug("Consent popup found. Clicking on ok.")
-            # Show all releases by clicking on all "Show all" links.
-            try:
-                for index, link in enumerate(
-                    self.find_elements("disco_expand_section_link")
-                ):
-                    self.execute_script(
-                        f"document.getElementsByClassName('disco_expand_section_link')[{index}].scrollIntoView(true);"
-                    )
-                    link.click()
-                    time.sleep(0.2)
-            except Exception as e:
-                logger.debug('No "Show all" links found : %s.', e)
+            class_to_click_on = [
+                "as-oil__btn-optin",  # cookie bar
+                "fc-cta-consent",  # consent popup
+                # "ad-close-button",  # advertisement banner
+            ]
+            for i in class_to_click_on:
+                if len(self.find_elements(By.CLASS_NAME, i)) > 0:
+                    self.find_element(By.CLASS_NAME, i).click()
+                    logger.debug(f"{i} found. Clicking on it.")
+
+            if len(self.find_elements(By.CLASS_NAME, "disco_expand_section_link")) > 0:
+                try:
+                    for index, link in enumerate(
+                        self.find_elements(By.CLASS_NAME, "disco_expand_section_link")
+                    ):
+                        self.execute_script(
+                            f"document.getElementsByClassName('disco_expand_section_link')[{index}].scrollIntoView(true);"
+                        )
+                        link.click()
+                        time.sleep(0.2)
+                except Exception as e:
+                    logger.debug('No "Show all" links found : %s.', e)
             # Test if IP is banned.
             if self.is_ip_banned():
                 logger.error(

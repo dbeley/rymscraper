@@ -1,11 +1,10 @@
-from rymscraper import RymNetwork
+from rymscraper import rymscraper
 import pytest
 
 
-# @pytest.fixture
 @pytest.fixture(scope="session", autouse=True)
 def network():
-    network = RymNetwork(headless=True)
+    network = rymscraper.RymNetwork(headless=True)
     yield network
     network.browser.close()
     network.browser.quit()

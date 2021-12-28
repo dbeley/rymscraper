@@ -29,9 +29,7 @@ python setup.py install
 Installation in a virtualenv with pipenv
 
 ```
-pipenv install
-pipenv shell
-python setup.py install
+pipenv install '-e .'
 ```
 
 ## Example
@@ -39,9 +37,8 @@ python setup.py install
 The data format used by the library is the python dict. It can be easily converted to CSV or JSON.
 
 ```python
->>> import rymscraper
 >>> import pandas as pd
->>> from rymscraper import RymUrl
+>>> from rymscraper import rymscraper, RymUrl
 
 >>> network = rymscraper.RymNetwork()
 ```

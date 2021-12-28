@@ -43,3 +43,31 @@ def test_album_infos(network):
 
     if album_infos["Type"] != "Album":
         raise AssertionError()
+
+    if album_infos["Track listing"] != [
+        "To the Blade",
+        "Distant Past",
+        "Get to Heaven",
+        "Regret",
+        "Spring / Sun / Winter / Dread",
+        "The Wheel (Is Turning Now)",
+        "Fortune 500",
+        "Blast Doors",
+        "Zero Pharaoh",
+        "No Reptiles",
+        "Warm Healer",
+    ]:
+        raise AssertionError()
+
+    if album_infos["Colorscheme"] != [
+        "#f47b50",
+        "#8da3c8",
+        "#242960",
+        "#3b488c",
+        "#cd2769",
+        "#fab43b",
+        "#b97d49",
+        "#ac1e68",
+        "#3a53a7",
+    ]:
+        raise AssertionError()

@@ -1,8 +1,8 @@
 import logging
 import re
 import time
-from tqdm import tqdm
 import difflib
+from tqdm import tqdm
 from bs4 import BeautifulSoup, NavigableString, element
 from selenium.webdriver.common.by import By
 from typing import List
@@ -77,6 +77,19 @@ def get_album_infos(soup: BeautifulSoup) -> dict:
     except KeyError:
         pass
 
+    album_infos["Track listing"] = [
+        x.find("span", {"class": "tracklist_title"})
+        .find("span", {"class": "rendered_text"})
+        .text.strip()
+        for x in soup.find("ul", {"id": "tracks"}).find_all("li")
+        if x.find("span", {"class": "tracklist_title"})
+    ]
+
+    album_infos["Colorscheme"] = [
+        re.split(";|:", x["style"])[1]
+        for x in soup.find("table", {"class": "color_bar"}).find_all("td")
+    ]
+
     return album_infos
 
 
@@ -108,6 +121,9 @@ def get_album_timeline(browser) -> List[dict]:
             == 0
         ):
             break
+        browser.execute_script(
+            "document.getElementsByClassName('navlinknext')[1].scrollIntoView(true);"
+        )
         browser.find_element(By.CLASS_NAME, "catalog_section").find_element(
             By.CLASS_NAME, "navlinknext"
         ).click()

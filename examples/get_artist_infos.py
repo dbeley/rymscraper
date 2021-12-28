@@ -3,7 +3,7 @@ import time
 import argparse
 import pandas as pd
 from pathlib import Path
-import rymscraper
+from rymscraper import rymscraper
 
 logger = logging.getLogger()
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -16,9 +16,7 @@ def main():
 
     # arguments parsing
     if not any([args.url, args.artist, args.file_url, args.file_artist]):
-        logger.error(
-            "Not enough arguments. Use -h to see available arguments."
-        )
+        logger.error("Not enough arguments. Use -h to see available arguments.")
         exit()
     list_urls = None
     list_artists = None
@@ -49,9 +47,7 @@ def main():
         except Exception as e:
             logger.error(e)
             exit()
-        logger.debug(
-            "Option file_artist found, list_artists : %s.", list_artists
-        )
+        logger.debug("Option file_artist found, list_artists : %s.", list_artists)
 
     RymNetwork = rymscraper.RymNetwork(headless=args.no_headless)
     logger.info("Extracting artist infos.")
