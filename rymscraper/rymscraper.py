@@ -127,15 +127,11 @@ class RymNetwork:
                 soup = self.browser.get_soup()
 
                 # table containing albums
-                if soup.find(
-                    "div", {"class": "chart_results chart_results_ charts_page"}
-                ):
-                    logger.debug("Table class mbgen found")
-                    table = soup.find(
-                        "div", {"class": "chart_results chart_results_ charts_page"}
-                    )
+                if soup.find("sections", {"id": "page_sections_charts"}):
+                    logger.debug("Table containing chart elements found")
+                    table = soup.find("section", {"id": "page_charts_section_charts"})
                     rows = table.find_all(
-                        "div", {"class": "topcharts_itembox chart_item_release"}
+                        "div", {"class": "page_section_charts_item_wrapper anchor"}
                     )
                     if len(rows) == 0:
                         logger.debug("No rows extracted. Exiting")

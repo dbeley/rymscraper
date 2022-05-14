@@ -171,19 +171,23 @@ def get_chart_row_infos(row: element.Tag) -> dict:
     """Returns a dict containing infos from a chart row."""
     dict_row = {}
     try:
-        dict_row["Rank"] = row.find(
-            "div", {"class": "topcharts_position"}
-        ).text.replace(".", "")
+        dict_row["Rank"] = row.get("id").replace("pos", "")
     except Exception as e:
-        logger.error("Rank : %s", e)
+        logger.error("Error when fetching Rank: %s", e)
         dict_row["Rank"] = "NA"
     try:
-        dict_row["Artist"] = row.find("div", {"class": "topcharts_item_artist"}).text
+        dict_row["Artist"] = row.find(
+            "div",
+            {"class": "page_charts_section_charts_item_credited_links_primary"},
+        ).text.replace("\n", "")
     except Exception as e:
-        logger.error("Artist: %s", e)
+        logger.error("Error when fetching Artist: %s", e)
         dict_row["Artist"] = "NA"
     try:
-        dict_row["Album"] = row.find("div", {"class": "topcharts_item_title"}).text
+        dict_row["Album"] = row.find(
+            "div",
+            {"class": "page_charts_section_charts_item_title"},
+        ).text.replace("\n", "")
         logger.debug(
             "%s - %s - %s",
             dict_row["Rank"],
@@ -191,44 +195,54 @@ def get_chart_row_infos(row: element.Tag) -> dict:
             dict_row["Album"],
         )
     except Exception as e:
-        logger.error("Album : %s", e)
+        logger.error("Error when fetching Album: %s", e)
         dict_row["Album"] = "NA"
     try:
         dict_row["Date"] = (
-            row.find("div", {"class": "topcharts_item_releasedate"})
-            .text.replace("(", "")
-            .replace(")", "")
+            row.find("div", {"class": "page_charts_section_charts_item_date"})
+            .find_all("span")[0]
+            .text.replace("\n", "")
             .strip()
         )
     except Exception as e:
-        logger.error("Date : %s", e)
+        logger.error("Error when fetching Date: %s", e)
         dict_row["Date"] = "NA"
     try:
         dict_row["Genres"] = ", ".join(
             [
                 x.text
                 for x in row.find(
-                    "div", {"class": "topcharts_item_genres_container"}
+                    "div", {"class": "page_charts_section_charts_item_genres_primary"}
                 ).find_all("a", {"class": "genre"})
             ]
         )
     except Exception as e:
-        logger.error("Genres : %s", e)
+        logger.error("Error when fetching Genres: %s", e)
         dict_row["Genres"] = "NA"
     try:
         dict_row["RYM Rating"] = row.find(
-            "span", {"class": "topcharts_avg_rating_stat"}
+            "span", {"class": "page_charts_section_charts_item_details_average_num"}
         ).text
-        dict_row["Ratings"] = row.find(
-            "span", {"class": "topcharts_ratings_stat"}
-        ).text.replace(",", "")
-        dict_row["Reviews"] = row.find(
-            "span", {"class": "topcharts_reviews_stat"}
-        ).text.replace(",", "")
     except Exception as e:
-        logger.error("Ratings : %s", e)
-        dict_row["RYM Ratings"] = "NA"
+        logger.error("Error when fetching RYM Rating: %s", e)
+        dict_row["RYM Rating"] = "NA"
+    try:
+        dict_row["Ratings"] = (
+            row.find_all("span", {"class": "full"})[0]
+            .text.replace("\n", "")
+            .replace(" ", "")
+        )
+    except Exception as e:
+        logger.error("Error when fetching Ratings: %s", e)
         dict_row["Ratings"] = "NA"
+    try:
+        dict_row["Reviews"] = (
+            row.find_all("span", {"class": "full"})[1]
+            .text.replace("\n", "")
+            .replace(" ", "")
+        )
+    except Exception as e:
+        logger.error("Error when fetching Reviews: %s", e)
         dict_row["Reviews"] = "NA"
     return dict_row
 

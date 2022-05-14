@@ -17,7 +17,7 @@ def test_artist_infos(network):
     if artist_infos["Formed"] != "January 1998, San Diego, CA, United States":
         raise AssertionError()
 
-    if artist_infos["Genres"] != "Indie Rock, Indie Pop":
+    if artist_infos["Genres"] != "Indie Rock, Indie Pop, Art Rock":
         raise AssertionError()
 
     if (
