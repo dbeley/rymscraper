@@ -9,7 +9,7 @@ charset-normalizer==2.0.12
 cryptography==37.0.2
 h11==0.13.0
 idna==3.3
-lxml==4.8.0
+lxml==4.9.1
 numpy==1.22.3
 outcome==1.1.0
 pandas==1.4.2
