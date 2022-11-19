@@ -1,35 +1,32 @@
 # For now you will have to directly change the string values. Look at examples/get_chart.py for examples.
 # https://rateyourmusic.com/charts/top/release/1984-2002/g:ambient/loc:france/minr:200/
 # https://rateyourmusic.com/charts/top/album,ep,single,unauth,djmix/2010s/g:ambient,blues/d:atmosphere,form,theme,bittersweet,epic/s:classical%2dmusic/loc:algeria,bouvet%2disland%2dbouvetoya,europe,antarctica%2d1/minr:200/pop:5/
+from typing import Optional
+
+
 class RymUrl:
-    def __init__(self):
-        self.url_base = f"https://rateyourmusic.com/charts/top"
-        self.url_part_type = "/album"
-        self.url_part_year = ""
-        self.url_part_genres = ""
-        # self.url_part_include_child_genres_chk = "&include_child_genres_chk=1"
-        # self.url_part_include_both = "&include_both"
-        self.url_part_origin_countries = ""
-        # self.url_part_limit = "&limit=none"
-        # self.url_part_countries = "&countries="
-        self.page_separator = "/"
-        self.page = 1
+    @staticmethod
+    def sanitize_name(name: Optional[str]) -> Optional[str]:
+        if name is None:
+            return None
+        return name.replace(" ", "-")
+
+    def __init__(self, type="album", year="all-time", genres: str = None, origin_countries: str = None, language: str = None, descriptors: str = None, page=1):
+        self.url_base = "https://rateyourmusic.com/charts/top/"
+
+        self.type = type
+        self.year = year
+        self.genres = self.sanitize_name(genres)
+        self.origin_countries = self.sanitize_name(origin_countries)
+        self.language = self.sanitize_name(language)
+        self.descriptors = self.sanitize_name(descriptors)
+        self.page = page
 
     def __repr__(self):
-        final_url = (
-            self.url_base
-            + self.url_part_type
-            + self.url_part_year
-            # + self.url_part_genre_include
-            # + self.url_part_child_genres
-            + self.url_part_genres
-            # + self.url_part_include_child_genres_chk
-            # + self.url_part_include_both
-            + self.url_part_origin_countries
-            # + self.url_part_limit
-            # + self.url_part_countries
-            + self.page_separator
-            + str(self.page)
-            + "/"
-        )
+        genres = f"/g:{self.genres}" if self.genres else ""
+        origin_countries = f"/loc:{self.origin_countries}" if self.origin_countries else ""
+        language = f"/l:{self.language}" if self.language else ""
+        descriptors = f"/d:{self.descriptors}" if self.descriptors else ""
+        final_url = f"{self.url_base}/{self.type}/{self.year}{genres}{origin_countries}{language}{descriptors}/{self.page}/"
+
         return final_url
