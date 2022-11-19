@@ -11,11 +11,11 @@ class RymUrl:
             return None
         return name.replace(" ", "-")
 
-    def __init__(self, type="album", year="all-time", genres: str = None, origin_countries: str = None, language: str = None, descriptors: str = None, page=1):
+    def __init__(self, kind="album", year="all-time", genres: str = None, origin_countries: str = None, language: str = None, descriptors: str = None, page=1):
         """The language should be the 2 letter code for the language. For example, English is en, French is fr, etc."""
         self.url_base = "https://rateyourmusic.com/charts/top"
 
-        self.type = type
+        self.kind = kind
         self.year = year
         self.genres = self.sanitize_name(genres)
         self.origin_countries = self.sanitize_name(origin_countries)
@@ -28,6 +28,6 @@ class RymUrl:
         origin_countries = f"/loc:{self.origin_countries}" if self.origin_countries else ""
         language = f"/l:{self.language}" if self.language else ""
         descriptors = f"/d:{self.descriptors}" if self.descriptors else ""
-        final_url = f"{self.url_base}/{self.type}/{self.year}{genres}{origin_countries}{language}{descriptors}/{self.page}/"
+        final_url = f"{self.url_base}/{self.kind}/{self.year}{genres}{origin_countries}{language}{descriptors}/{self.page}/"
 
         return final_url
