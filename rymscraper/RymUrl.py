@@ -12,7 +12,8 @@ class RymUrl:
         return name.replace(" ", "-")
 
     def __init__(self, type="album", year="all-time", genres: str = None, origin_countries: str = None, language: str = None, descriptors: str = None, page=1):
-        self.url_base = "https://rateyourmusic.com/charts/top/"
+        """The language should be the 2 letter code for the language. For example, English is en, French is fr, etc."""
+        self.url_base = "https://rateyourmusic.com/charts/top"
 
         self.type = type
         self.year = year
