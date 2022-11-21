@@ -131,7 +131,7 @@ class RymNetwork:
                     logger.debug("Table containing chart elements found")
                     table = soup.find("section", {"id": "page_charts_section_charts"})
                     rows = table.find_all(
-                        "div", {"class": "page_section_charts_item_wrapper anchor"}
+                        "div", {"class": "page_section_charts_item_wrapper"}
                     )
                     if len(rows) == 0:
                         logger.debug("No rows extracted. Exiting")
