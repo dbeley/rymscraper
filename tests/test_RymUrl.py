@@ -9,11 +9,8 @@ def test_RymUrlSimple():
 
 
 def test_RymUrlAdvanced():
-    RymUrlTest = RymUrl.RymUrl()
-    RymUrlTest.url_part_type = "/release"
-    RymUrlTest.url_part_origin_countries = "/loc:france"
-    RymUrlTest.url_part_year = "/2010s"
-    RymUrlTest.url_part_genres += "/g:rock"
+    RymUrlTest = RymUrl.RymUrl(kind="release", origin_countries="france", year="2010s", genres="rock")
+
     print(str(RymUrlTest))
     if (
         str(RymUrlTest)
