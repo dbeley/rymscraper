@@ -176,10 +176,22 @@ def get_chart_row_infos(row: element.Tag) -> dict:
         logger.error("Error when fetching Rank: %s", e)
         dict_row["Rank"] = "NA"
     try:
-        dict_row["Artist"] = row.find(
+        artist_div = dict_row["Artist"] = row.find(
             "div",
             {"class": "page_charts_section_charts_item_credited_links_primary"},
-        ).text.replace("\n", "")
+        )
+        romanized_version_span = artist_div.find("span", {"class": "ui_name_locale_language"})
+            
+        original_name_span =  artist_div.find("span", {"class": "ui_name_locale_original"})
+        
+        if romanized_version_span:
+            dict_row["Artist"] = f"{romanized_version_span.text} [{original_name_span.text}]"
+        elif original_name_span:
+            dict_row["Artist"] = original_name_span.text
+        else:
+            dict_row["Artist"] = artist_div.text
+        
+        dict_row["Artist"] = dict_row["Artist"].replace("\n", "")
     except Exception as e:
         logger.error("Error when fetching Artist: %s", e)
         dict_row["Artist"] = "NA"
