@@ -17,13 +17,14 @@ def main():
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
     if not args.url:
-        url = RymUrl.RymUrl()
+        
+        url = RymUrl.RymUrl(year=args.year, genres=args.genre, origin_countries=args.country)
         export_filename = f"{export_directory}/{int(time.time())}_export_chart"
         logger.debug("rym_url : %s.", url)
 
         if args.everything:
             export_filename += f"_everything"
-            url.url_part_type = f"/release"
+            url.kind = "release"
         else:
             export_filename += f"_album"
         if args.year:
