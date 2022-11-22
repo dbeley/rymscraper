@@ -17,8 +17,10 @@ def main():
     Path(export_directory).mkdir(parents=True, exist_ok=True)
 
     if not args.url:
-        
-        url = RymUrl.RymUrl(year=args.year, genres=args.genre, origin_countries=args.country)
+
+        url = RymUrl.RymUrl(
+            year=args.year, genres=args.genre, origin_countries=args.country
+        )
         export_filename = f"{export_directory}/{int(time.time())}_export_chart"
         logger.debug("rym_url : %s.", url)
 
@@ -29,13 +31,10 @@ def main():
             export_filename += f"_album"
         if args.year:
             export_filename += f"_{args.year}"
-            url.url_part_year = f"/{args.year}"
         if args.genre:
             export_filename += f"_{args.genre}"
-            url.url_part_genres = f"/g:{args.genre}"
         if args.country:
             export_filename += f"_{args.country}"
-            url.url_part_origin_countries = f"/loc:{args.country}"
     else:
         url = args.url
         export_filename = f"{export_directory}/{int(time.time())}_export_url"
@@ -85,7 +84,7 @@ def parse_args():
     parser.add_argument(
         "-g",
         "--genre",
-        help="Chart Option : Genre. Use '+' if you need a space, multiple genres selection is supported (example: 'genre1,genre2').",
+        help="Chart Option : Genre. Use '-' if you need a space, multiple genres selection is supported (example: 'genre1,genre2').",
         type=str,
     )
     parser.add_argument(
