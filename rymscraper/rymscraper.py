@@ -103,9 +103,7 @@ class RymNetwork:
 
         return list_artists_infos
 
-    def get_chart_infos(
-        self, url: RymUrl.RymUrl, max_page: int = None
-    ) -> List[Dict]:
+    def get_chart_infos(self, url: RymUrl.RymUrl, max_page: int = None) -> List[Dict]:
         """Returns a list of dicts containing chart infos.
 
         Parameters:
