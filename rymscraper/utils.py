@@ -6,6 +6,7 @@ from tqdm import tqdm
 from bs4 import BeautifulSoup, NavigableString, element
 from selenium.webdriver.common.by import By
 from typing import List
+from rapidfuzz import fuzz, process
 
 logger = logging.getLogger(__name__)
 
@@ -15,30 +16,33 @@ def get_close_matches_icase(word, possibilities, *args, **kwargs):
     lword = word.lower()
     lpos = {p.lower(): p for p in possibilities}
     lmatch = difflib.get_close_matches(lword, lpos.keys(), *args, **kwargs)
+    if not lmatch:
+        best_match = process.extractOne(lword, lpos.keys(), scorer=fuzz.WRatio, score_cutoff=85)
+        if best_match:
+            lmatch = [best_match[0]]
+
     return [lpos[m] for m in lmatch]
 
-
-def get_url_from_artist_name(browser, artist: str) -> str:
-    """Returns the url of the first result for an name on rateyourmusic."""
+def get_urls_from_artist_name(browser, artist: str) -> List[str]:
+    """Returns a list of urls for all results for an artist name on rateyourmusic."""
     base_url = "https://rateyourmusic.com"
     artist = artist.strip().replace(" ", "+")
     url = f"{base_url}/search?searchtype=a&searchterm={artist}"
     logger.debug("Searching %s in url %s", artist, url)
     browser.get_url(url)
     soup = browser.get_soup()
-    url_artist = f"{base_url}{soup.find('a', {'class': 'searchpage'})['href']}"
-    logger.debug("url for %s found : %s", artist, url_artist)
-    return url_artist
-
+    urls_artist = [f"{base_url}{link['href']}" for link in soup.find_all('a', {'class': 'searchpage'})]
+    logger.debug("URLs for %s found : %s", artist, urls_artist)
+    return urls_artist
 
 def get_url_from_album_name(browser, name: str) -> str:
     """Returns the url of an album."""
-    album_name = name.split("-")[1].strip()
-    artist_name = name.split("-")[0].strip()
-    artist_url = get_url_from_artist_name(browser, artist_name)
+    album_name = name.split(" - ")[1].strip()
+    artist_name = name.split(" - ")[0].strip()
+    artist_urls = get_urls_from_artist_name(browser, artist_name)
 
-    logger.debug("Searching for %s at %s", album_name, artist_url)
-    browser.get_url(artist_url)
+    logger.debug("Searching for %s at %s", album_name, artist_urls[0])
+    browser.get_url(artist_urls[0])
     soup = browser.get_soup()
     artist_album_list = [
         [x.text.strip(), "https://rateyourmusic.com" + x.find("a")["href"]]
@@ -47,46 +51,79 @@ def get_url_from_album_name(browser, name: str) -> str:
     artist_album_url = [x[1] for x in artist_album_list]
     artist_album_name = [x[0] for x in artist_album_list]
 
-    url_match = artist_album_url[
-        artist_album_name.index(
-            get_close_matches_icase(album_name, artist_album_name)[0]
-        )
-    ]
-    logger.debug("Best match : %s", url_match)
-    return url_match
+    matches = process.extract(album_name, artist_album_name)
+    if matches and matches[0][1] >= 90:  # you may adjust the threshold as needed
+        best_match_url = artist_album_url[artist_album_name.index(matches[0][0])]
+        logger.debug("Best match : %s", best_match_url)
+        return best_match_url
+
+    # If we haven't found a good match yet, consider other URLs
+    for artist_url in artist_urls[1:]:
+        logger.debug("Searching for %s at %s", album_name, artist_url)
+        browser.get_url(artist_url)
+        soup = browser.get_soup()
+        artist_album_list = [
+            [x.text.strip(), "https://rateyourmusic.com" + x.find("a")["href"]]
+            for x in soup.find_all("div", {"class": "disco_mainline"})
+        ]
+        artist_album_url = [x[1] for x in artist_album_list]
+        artist_album_name = [x[0] for x in artist_album_list]
+
+        matches = process.extract(album_name, artist_album_name)
+        if matches and matches[0][1] >= 90:  # you may adjust the threshold as needed
+            best_match_url = artist_album_url[artist_album_name.index(matches[0][0])]
+            logger.debug("Best match : %s", best_match_url)
+            return best_match_url
+
+    logger.error("Could not find a match for album '%s' from artist '%s'", album_name, artist_name)
+    return None
 
 
 def get_album_infos(soup: BeautifulSoup) -> dict:
     """Returns a dict containing infos from an album."""
-    album_infos = {
-    "Name": soup.find("div", {"class": "album_title"}).text.split("\n")[0].strip(),
-    "Artist": soup.find("div", {"class": "album_title"}).text.split("\n")[2].strip()[3:],
-    }   
+    album_title_text = soup.find("div", {"class": "album_title"}).text.split("\n")
+    try:
+        album_infos = {
+            "Name": album_title_text[0].strip() if len(album_title_text) > 0 else None,
+            "Artist": album_title_text[2].strip()[3:] if len(album_title_text) > 2 else None,
+        }   
+    except Exception as e:
+        print(f"Error in fetching album basic info: {e}")
+        return {}
 
-    album_complementary_infos = [
-        [x.find("th").text.strip(), x.find("td").text.strip()]
-        for x in soup.find("table", {"class": "album_info"}).find_all("tr")
-    ]
-    for info in album_complementary_infos:
-        album_infos[info[0]] = info[1]
+    try:
+        album_complementary_infos = [
+            [x.find("th").text.strip(), x.find("td").text.strip()]
+            for x in soup.find("table", {"class": "album_info"}).find_all("tr")
+        ]
+        for info in album_complementary_infos:
+            album_infos[info[0]] = info[1]
+    except Exception as e:
+        print(f"Error in fetching album complementary info: {e}")
 
     try:
         del album_infos["Share"]
     except KeyError:
         pass
 
-    album_infos["Track listing"] = [
-        x.find("span", {"class": "tracklist_title"})
-        .find("span", {"class": "rendered_text"})
-        .text.strip()
-        for x in soup.find("ul", {"id": "tracks"}).find_all("li")
-        if x.find("span", {"class": "tracklist_title"})
-    ]
+    try:
+        album_infos["Track listing"] = [
+            x.find("span", {"class": "tracklist_title"})
+            .find("span", {"class": "rendered_text"})
+            .text.strip()
+            for x in soup.find("ul", {"id": "tracks"}).find_all("li")
+            if x.find("span", {"class": "tracklist_title"})
+        ]
+    except Exception as e:
+        print(f"Error in fetching album track listing: {e}")
 
-    album_infos["Colorscheme"] = [
-        re.split(";|:", x["style"])[1]
-        for x in soup.find("table", {"class": "color_bar"}).find_all("td")
-    ]
+    try:
+        album_infos["Colorscheme"] = [
+            re.split(";|:", x["style"])[1] if len(re.split(";|:", x["style"])) > 1 else None
+            for x in soup.find("table", {"class": "color_bar"}).find_all("td")
+        ]
+    except Exception as e:
+        print(f"Error in fetching album colorscheme: {e}")
 
     return album_infos
 

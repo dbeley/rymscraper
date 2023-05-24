@@ -1,6 +1,7 @@
 import logging
 from typing import List, Dict, Optional
 from . import RymBrowser, RymUrl, utils
+from rapidfuzz import process, fuzz
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +26,12 @@ class RymNetwork:
         if name:
             url = utils.get_url_from_album_name(self.browser, name)
         if not url:
-            raise Exception("Invalid url or name. Exiting.")
+            return None
 
         logger.info("Extracting album informations for %s.", url)
         self.browser.get_url(url)
         album_infos = utils.get_album_infos(self.browser.get_soup())
-        return album_infos
+        return album_infos 
 
     def get_albums_infos(
         self, urls: List[str] = None, names: List[str] = None
