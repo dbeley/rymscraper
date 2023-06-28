@@ -31,7 +31,7 @@ class RymNetwork:
         logger.info("Extracting album informations for %s.", url)
         self.browser.get_url(url)
         album_infos = utils.get_album_infos(self.browser.get_soup())
-        return album_infos 
+        return album_infos
 
     def get_albums_infos(
         self, urls: List[str] = None, names: List[str] = None
@@ -82,7 +82,7 @@ class RymNetwork:
     def get_artist_infos(self, url: str = None, name: str = None) -> Dict:
         """Returns a dict containing artist infos."""
         if name:
-            url = utils.get_url_from_artist_name(self.browser, name)
+            url = utils.get_urls_from_artist_name(self.browser, name)[0]
         if not url:
             raise Exception("Invalid url or name. Exiting.")
 
@@ -174,7 +174,7 @@ class RymNetwork:
     ) -> List[Dict]:
         """Returns a list of dict containing discography infos."""
         if name:
-            url = utils.get_url_from_artist_name(self.browser, name)
+            url = utils.get_urls_from_artist_name(self.browser, name)[0]
         if not url:
             raise Exception("Invalid url or name. Exiting.")
 
