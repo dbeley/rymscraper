@@ -13,7 +13,7 @@ class RymBrowser(webdriver.Firefox):
         logger.debug("Starting Selenium Browser : headless = %s", headless)
         self.options = Options()
         if headless:
-            self.options.headless = True
+            self.options.add_argument('-headless')
 
         webdriver.Firefox.__init__(self, options=self.options)
 
@@ -49,11 +49,8 @@ class RymBrowser(webdriver.Firefox):
                     logger.debug('No "Show all" links found : %s.', e)
             # Test if IP is banned.
             if self.is_ip_banned():
-                logger.error(
-                    "IP banned from rym. Can't do any requests to the website. Exiting."
-                )
                 self.quit()
-                exit()
+                raise Exception("IP banned from rym. Can't do any requests to the website. Exiting.")
             # Test if browser is rate-limited.
             if self.is_rate_limited():
                 logger.error("Rate-limit detected. Restarting browser.")
