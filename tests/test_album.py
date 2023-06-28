@@ -31,7 +31,7 @@ def test_album_infos(network):
     print(album_infos)
     if (
         album_infos["Genres"]
-        != "Art Pop, Indie Rock, Progressive Pop\nIndietronica, Alternative Dance, New Wave, Math Pop"
+        != "Art Pop, Progressive Pop, Indie Rock\nIndietronica, Alternative Dance, New Wave, Math Pop"
     ):
         raise AssertionError()
 

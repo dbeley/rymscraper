@@ -27,16 +27,16 @@ def test_chart_infos(network):
     if not second_page_item["Rank"] == str(page_size + 1):
         raise AssertionError()
 
-    if not first_item["Artist"] == "Radiohead":
+    if not first_item["Artist"] == "Kendrick Lamar":
         raise AssertionError()
 
-    if not first_item["Album"] == "OK Computer":
+    if not first_item["Album"] == "To Pimp a Butterfly":
         raise AssertionError()
 
-    if not first_item["Date"] == "16 June 1997":
+    if not first_item["Date"] == "15 March 2015":
         raise AssertionError()
 
-    if not first_item["Genres"] == "Alternative Rock, Art Rock":
+    if not first_item["Genres"] == "Conscious Hip Hop, West Coast Hip Hop, Jazz Rap":
         raise AssertionError()
 
     if (
