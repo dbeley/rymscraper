@@ -26,5 +26,6 @@ setuptools.setup(
         "lxml",
         "selenium",
         "tqdm",
+        "rapidfuzz",
     ],
 )
