@@ -273,6 +273,18 @@ def get_chart_row_infos(row: element.Tag) -> dict:
         logger.error("Error when fetching Genres: %s", e)
         dict_row["Genres"] = "NA"
     try:
+        dict_row["Secondary Genres"] = ", ".join(
+            [
+                x.text
+                for x in row.find(
+                    "div", {"class": "page_charts_section_charts_item_genres_secondary"}
+                ).find_all("a", {"class": "genre"})
+            ]
+        )
+    except Exception as e:
+        logger.error("Error when fetching Secondary Genres (Very likely the album doesn't have secondaries.): %s", e)
+        dict_row["Secondary Genres"] = "NA"
+    try:
         dict_row["RYM Rating"] = row.find(
             "span", {"class": "page_charts_section_charts_item_details_average_num"}
         ).text

@@ -52,6 +52,7 @@ def main():
         "Album",
         "Date",
         "Genres",
+        "Secondary Genres",
         "RYM Rating",
         "Ratings",
         "Reviews",
