@@ -125,6 +125,11 @@ def get_album_infos(soup: BeautifulSoup) -> dict:
     except Exception as e:
         print(f"Error in fetching album colorscheme: {e}")
 
+    try:
+        album_infos["Cover"] = f"https:{soup.find('a', {'href': 'buy/'}).div.img['src']}"
+    except Exception as e:
+        print(f"Error fetching album cover: {e}")
+
     return album_infos
 
 
