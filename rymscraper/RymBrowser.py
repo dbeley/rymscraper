@@ -15,11 +15,11 @@ class RymBrowser(webdriver.Firefox):
         if headless:
             self.options.add_argument('-headless')
 
-        webdriver.Firefox.__init__(self, options=self.options)
+        webdriver.Firefox.__init__(self, options=self.options, keep_alive=False)
 
     def restart(self):
         self.quit()
-        webdriver.Firefox.__init__(self, options=self.options)
+        webdriver.Firefox.__init__(self, options=self.options, keep_alive=False)
 
     def get_url(self, url):
         logger.debug("get_url(browser, %s)", url)
@@ -50,7 +50,8 @@ class RymBrowser(webdriver.Firefox):
             # Test if IP is banned.
             if self.is_ip_banned():
                 self.quit()
-                raise Exception("IP banned from rym. Can't do any requests to the website. Exiting.")
+                raise Exception(
+                    "IP banned from rym. Can't do any requests to the website. Exiting.")
             # Test if browser is rate-limited.
             if self.is_rate_limited():
                 logger.error("Rate-limit detected. Restarting browser.")
