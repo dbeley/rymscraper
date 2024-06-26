@@ -1,5 +1,7 @@
 # rymscraper
 
+> :warning: With the recent addition of Cloudflare protection to rateyourmusic, **rymscraper** is not properly working anymore.
+
 ![Build Status](https://github.com/dbeley/rymscraper/workflows/CI/badge.svg)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8601652424ab44698fd00f6a46a2140e)](https://www.codacy.com/app/dbeley/rymscraper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dbeley/rymscraper&amp;utm_campaign=Badge_Grade)
 
